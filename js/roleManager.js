@@ -7,6 +7,7 @@ class RoleManager {
     constructor(gameManager) {
         this.gameManager = gameManager;
         this.voiceManager = null;
+        this.soundManager = null;
         this.players = [];
         this.currentPlayerIndex = 0;
         this.isAssigningRoles = false;
@@ -16,6 +17,10 @@ class RoleManager {
     
     setVoiceManager(voiceManager) {
         this.voiceManager = voiceManager;
+    }
+    
+    setSoundManager(soundManager) {
+        this.soundManager = soundManager;
     }
     
     async startRoleAssignment(playersData) {

@@ -208,6 +208,13 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
     animation: pulse 2s ease-in-out infinite;
 }
 
+.loading-progress {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

@@ -81,6 +81,12 @@ class GameManager {
                 this.voiceManager = null;
             }
             
+            // Connect sound manager to role manager for sound effects
+            if (this.soundManager && this.roleManager && typeof this.roleManager.setSoundManager === 'function') {
+                this.roleManager.setSoundManager(this.soundManager);
+                this.logger?.audio('Sound Manager connected to Role Manager');
+            }
+            
             // Validate critical components
             if (!this.roleManager) {
                 throw new Error('Role Manager is required but failed to initialize');
