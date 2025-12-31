@@ -452,7 +452,45 @@ window.initMainMenuScene = function() {
     window.mainMenuScene.init();
 };
 
- 
+// ============================================
+// MOBILE DEVICE DETECTION & INITIALIZATION
+// ============================================
+
+// Detect device type for better initialization
+window.getDeviceType = function() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+        return 'tablet';
+    }
+    
+    if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+        return 'mobile';
+    }
+    
+    return 'desktop';
+};
+
+// Initialize with proper timing for different devices
+window.initAppOnDevice = function() {
+    const deviceType = window.getDeviceType();
+    console.log('📱 Device type detected:', deviceType);
+    
+    // Different delays based on device type
+    let delay = deviceType === 'mobile' ? 300 : 100;
+    
+    // Additional delay for slower devices
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+        delay += 200;
+        console.log('🔧 Low-performance device detected, using extended delay');
+    }
+    
+    setTimeout(() => {
+        if (typeof THREE !== 'undefined') {
+            window.initMainMenuScene();
+        }
+    }, delay);
+};
 
 // Global error handlers to prevent silent failures
 window.addEventListener('error', (event) => {
@@ -942,4 +980,4 @@ window.testPerfectTeamWinSounds = function() {
     }, 2000);
     
     console.log('🧪 Perfect team win sounds test complete! Both sounds should play from beginning.');
-}; 
+};

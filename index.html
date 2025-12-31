@@ -1421,13 +1421,46 @@
             }
         }
 
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            // Simple initialization with reasonable delay
-            setTimeout(() => {
+        // Initialize when DOM is ready - mobile compatible
+        function initializeApp() {
+            if (window.LightChallengeApp && typeof window.LightChallengeApp.init === 'function') {
                 window.LightChallengeApp.init();
-            }, 100);
+            } else {
+                // Retry if app not ready yet
+                setTimeout(initializeApp, 50);
+            }
+        }
+        
+        // Determine best time to initialize based on device
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                // Mobile devices need more time for scripts to load
+                const isMobile = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(navigator.userAgent);
+                const delay = isMobile ? 200 : 50;
+                setTimeout(initializeApp, delay);
+            });
+        } else {
+            // DOM already loaded
+            const isMobile = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(navigator.userAgent);
+            const delay = isMobile ? 200 : 50;
+            setTimeout(initializeApp, delay);
+        }
+        
+        // Also try to initialize on visibility change (helps with some mobile browsers)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && !window.LightChallengeApp?.initialized) {
+                console.log('📱 Page visible, ensuring app is initialized');
+                initializeApp();
+            }
         });
+        
+        // Backup initialization timeout
+        setTimeout(() => {
+            if (!window.LightChallengeApp?.initialized) {
+                console.log('📱 Backup initialization triggered');
+                initializeApp();
+            }
+        }, 2000);
     </script>
 </head>
 <body>
@@ -1562,5 +1595,29 @@
     
     <!-- Main initialization -->
     <script src="js/main.js"></script>
+    
+    <!-- Service Worker Registration for PWA support -->
+    <script>
+        // Register service worker for offline support and PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Only register SW if not running from file:// protocol
+                if (location.protocol !== 'file:') {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(registration => {
+                            console.log('✅ Service Worker registered successfully:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.warn('⚠️ Service Worker registration failed:', error);
+                            // Service worker failure should not break the app
+                        });
+                } else {
+                    console.log('📱 Running from file:// protocol, skipping Service Worker registration');
+                }
+            });
+        } else {
+            console.log('📱 Service Worker not supported on this device');
+        }
+    </script>
 </body>
 </html>

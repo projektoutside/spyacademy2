@@ -6,29 +6,30 @@
 const CACHE_NAME = 'spy-academy-v1.0.2'; // Updated version for mobile fixes
 const OFFLINE_CACHE = 'spy-academy-offline-v1.0.2';
 
-// Critical files that must be cached
+// Critical files that must be cached - use relative paths for better device compatibility
 const CRITICAL_RESOURCES = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/manifest.json'
+    './',
+    './index.html',
+    './styles.css',
+    './manifest.json'
 ];
 
 // Game files - less aggressive caching for mobile
 const GAME_RESOURCES = [
-    '/js/utils/config.js',
-    '/js/utils/helpers.js',
-    '/js/utils/logger.js',
-    '/js/audio/soundManager.js',
-    '/js/managers/gameManager.js',
-    '/js/core/gameState.js',
-    '/js/main.js'
+    './js/utils/config.js',
+    './js/utils/helpers.js',
+    './js/utils/logger.js',
+    './js/soundManager.js',
+    './js/gameManager.js',
+    './js/main.js'
 ];
 
 // External resources
 const EXTERNAL_RESOURCES = [
     'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
-    'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cinzel:wght@400;600&display=swap'
+    'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cinzel:wght@400;600&display=swap',
+    'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 // Install event - cache critical resources only
@@ -243,4 +244,4 @@ self.addEventListener('unhandledrejection', (event) => {
     console.error('Service Worker unhandled rejection:', event.reason);
 });
 
-console.log('🚀 Service Worker script loaded - Version:', CACHE_NAME); 
+console.log('🚀 Service Worker script loaded - Version:', CACHE_NAME);
