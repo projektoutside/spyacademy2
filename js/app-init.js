@@ -142,62 +142,24 @@
             if (audioUnlocked) return;
             
             console.log('🎵 First user interaction detected:', e.type);
-            audioUnlocked = true;
-            window.LightChallengeApp.audioContextStarted = true;
             
-            // Resume AudioContext if sound manager exists
             if (window.soundManager && typeof window.soundManager.resumeAudioContext === 'function') {
                 window.soundManager.resumeAudioContext()
                     .then(function() {
+                        audioUnlocked = true;
+                        window.LightChallengeApp.audioContextStarted = true;
                         console.log('✅ Audio context ready');
                     })
                     .catch(function(err) {
                         console.warn('⚠️ Audio context failed:', err);
                     });
             }
-            
-            // Unlock voice synthesis for iOS devices
-            if (window.audioManager && typeof window.audioManager.unlockAudio === 'function') {
-                window.audioManager.unlockAudio()
-                    .then(function() {
-                        console.log('✅ Voice audio unlocked for iOS');
-                    })
-                    .catch(function(err) {
-                        console.warn('⚠️ Voice unlock failed:', err);
-                    });
-            }
-            
-            // Also try global voiceManager
-            if (window.gameManager && window.gameManager.voiceManager) {
-                var vm = window.gameManager.voiceManager;
-                if (typeof vm.unlockAudio === 'function') {
-                    vm.unlockAudio().catch(function(err) {
-                        console.warn('⚠️ VoiceManager unlock failed:', err);
-                    });
-                }
-            }
         }
         
-        // Listen for first interaction - use capture to catch all events
-        document.addEventListener('click', unlockAudio, { once: true, capture: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true, capture: true, passive: true });
-        document.addEventListener('touchend', unlockAudio, { once: true, capture: true, passive: true });
-        document.addEventListener('keydown', unlockAudio, { once: true, capture: true });
-        
-        // Also unlock on any button click
-        document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                if (window.audioManager && typeof window.audioManager.unlockAudio === 'function') {
-                    window.audioManager.unlockAudio();
-                }
-                if (window.gameManager && window.gameManager.voiceManager) {
-                    var vm = window.gameManager.voiceManager;
-                    if (typeof vm.unlockAudio === 'function') {
-                        vm.unlockAudio();
-                    }
-                }
-            }
-        }, { capture: true });
+        // Listen for first interaction
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
+        document.addEventListener('keydown', unlockAudio, { once: true });
     }
     
     /**
@@ -226,83 +188,12 @@
                 // Set up skip voting checkbox
                 setupSkipVotingCheckbox();
                 
-                // Set up AI voice API key controls
-                setupVoiceSettings();
-                
                 resolve();
             } catch (error) {
                 console.error('❌ UI setup failed:', error);
                 resolve(); // Continue anyway
             }
         });
-    }
-    
-    /**
-     * Setup voice settings for API key management
-     */
-    function setupVoiceSettings() {
-        var saveBtn = document.getElementById('save-api-key');
-        var clearBtn = document.getElementById('clear-api-key');
-        var keyInput = document.getElementById('elevenlabs-api-key');
-        var statusDiv = document.getElementById('voice-status');
-        
-        if (!saveBtn || !clearBtn || !keyInput || !statusDiv) {
-            console.log('⚠️ Voice settings UI elements not found');
-            return;
-        }
-        
-        // Load saved API key
-        var savedKey = localStorage.getItem('elevenlabs_api_key');
-        if (savedKey) {
-            keyInput.value = savedKey;
-            updateVoiceStatus('API key loaded - ElevenLabs ready!', 'success');
-        }
-        
-        // Save API key
-        saveBtn.addEventListener('click', function() {
-            var key = keyInput.value.trim();
-            
-            if (!key) {
-                updateVoiceStatus('Please enter a valid API key', 'error');
-                return;
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('elevenlabs_api_key', key);
-            
-            // Update voice manager if available
-            if (window.audioManager && window.audioManager.setElevenLabsKey) {
-                window.audioManager.setElevenLabsKey(key);
-            }
-            
-            updateVoiceStatus('API key saved! Voice will use ElevenLabs (Adam voice)', 'success');
-            console.log('✅ ElevenLabs API key saved');
-        });
-        
-        // Clear API key
-        clearBtn.addEventListener('click', function() {
-            localStorage.removeItem('elevenlabs_api_key');
-            keyInput.value = '';
-            
-            // Update voice manager if available
-            if (window.audioManager && window.audioManager.setElevenLabsKey) {
-                window.audioManager.setElevenLabsKey(null);
-            }
-            
-            updateVoiceStatus('API key cleared - will use browser default voice', 'info');
-            console.log('🗑️ ElevenLabs API key cleared');
-        });
-        
-        function updateVoiceStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = 'voice-status ' + type;
-            
-            // Auto-clear status after 5 seconds
-            setTimeout(function() {
-                statusDiv.textContent = '';
-                statusDiv.className = 'voice-status';
-            }, 5000);
-        }
     }
     
     /**

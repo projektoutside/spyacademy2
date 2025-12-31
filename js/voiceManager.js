@@ -9,14 +9,13 @@ class VoiceManager {
         // Voice service configuration
         this.voiceServices = {
             elevenlabs: {
-                enabled: true, // Enable by default for consistent voice across devices
+                enabled: false,
                 apiKey: null,
                 voiceId: 'pNInz6obpgDQGcFmaJgB', // Adam - Professional male
                 model: 'eleven_multilingual_v2',
-                stability: 0.35, // Lower = more expressive, higher = more consistent
-                similarityBoost: 0.9, // Maximum voice similarity
-                style: 0.2, // Subtle style for natural sound
-                useOptimizedStreaming: true
+                stability: 0.5,
+                similarityBoost: 0.8,
+                style: 0.3
             },
             azure: {
                 enabled: false,
@@ -248,7 +247,6 @@ class VoiceManager {
     
     /**
      * Browser speech synthesis with PROMISE support
-     * Enhanced for iOS/Safari compatibility
      */
     async speakBrowser(text, options = {}) {
         // If already speaking, cancel it to prevent overlapping
@@ -268,29 +266,9 @@ class VoiceManager {
                     utterance.voice = this.voice;
                 }
                 
-                // iOS-optimized settings
-        utterance.rate = options.rate || this.rate;
-        utterance.pitch = options.pitch || this.pitch;
-        utterance.volume = options.volume || this.volume;
-                
-                // iOS Safari specific fixes
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            utterance.rate = 0.9; // Slightly slower for better clarity on iOS
-            utterance.pitch = 1.0;
-            
-            // iOS requiresvoices to be loaded
-            const availableVoices = this.speechSynthesis.getVoices();
-            if (availableVoices.length > 0) {
-                // Try to find a good English voice for iOS
-                const iosVoice = availableVoices.find(v => 
-                    v.lang.startsWith('en') && 
-                    (v.name.includes('Samantha') || v.name.includes('Alex') || v.name.includes('Victoria'))
-                );
-                if (iosVoice) {
-                    utterance.voice = iosVoice;
-                }
-            }
-        }
+                utterance.rate = options.rate || this.rate;
+                utterance.pitch = options.pitch || this.pitch;
+                utterance.volume = options.volume || this.volume;
                 
                 let resolved = false;
                 const finish = () => {
@@ -307,41 +285,11 @@ class VoiceManager {
                     finish();
                 };
                 
-                // Safety timeout - shorter on mobile for responsiveness
-        const isMobile = /iPad|iPhone|iPod|Android/.test(navigator.userAgent);
-        const timeout = isMobile ? Math.min(this.speechTimeout, 15000) : this.speechTimeout;
-                setTimeout(finish, timeout);
+                // Safety timeout
+                setTimeout(finish, this.speechTimeout);
                 
                 this.isSpeaking = true;
-                
-        // iOS requires the speak to be called directly from a user interaction
-        // If we're not in a user interaction context, we need to ensure audio is unlocked
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            // On iOS, we need to resume the audio context if it exists
-            if (window.AudioContext && !this._audioContextUnlocked) {
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    if (audioCtx.state === 'suspended') {
-                        await audioCtx.resume();
-                    }
-                    this._audioContextUnlocked = true;
-                } catch (e) {
-                    console.warn('🎤 Could not unlock audio context:', e);
-                }
-            }
-        }
-        
                 this.speechSynthesis.speak(utterance);
-                
-        // iOS hack: sometimes speechSynthesis needs multiple attempts
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            setTimeout(() => {
-                if (this.isSpeaking && !resolved) {
-                    console.log('🎤 iOS retrying speech...');
-                    this.speechSynthesis.speak(utterance);
-                }
-            }, 100);
-        }
                 
             } catch (error) {
                 console.error('🎤 Browser speech error:', error);
@@ -349,30 +297,6 @@ class VoiceManager {
                 resolve();
             }
         });
-    }
-    
-    /**
-     * Unlock audio on iOS devices - call this on first user interaction
-     */
-    async unlockAudio() {
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            try {
-                // Create and immediately pause an audio context to unlock it
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') {
-                    await audioCtx.resume();
-                }
-                
-                // Also trigger a silent speech synthesis to unlock it
-                const silentUtterance = new SpeechSynthesisUtterance('');
-                this.speechSynthesis.speak(silentUtterance);
-                
-                this._audioContextUnlocked = true;
-                console.log('🎤 iOS audio unlocked');
-            } catch (error) {
-                console.warn('🎤 Failed to unlock iOS audio:', error);
-            }
-        }
     }
 
     async speakElevenLabs(text, options = {}) {
