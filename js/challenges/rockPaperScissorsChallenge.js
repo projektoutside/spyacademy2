@@ -161,214 +161,154 @@ class RockPaperScissorsChallenge {
     }
     
     async showGameIntroduction() {
-        const overlay = this.createOverlay();
-        
-        // Add Skip Intro Button
-        const skipBtn = document.createElement('button');
-        skipBtn.id = 'skip-intro-btn';
-        skipBtn.innerHTML = 'Skip Intro ⏩';
-        skipBtn.style.cssText = `
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 15px 30px;
-            background: rgba(255, 107, 53, 0.8);
-            color: white;
-            border: 2px solid #ff6b35;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
-            font-size: 1.2rem;
-            z-index: 10001;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        `;
-        
-        skipBtn.onmouseover = () => {
-            skipBtn.style.background = '#ff6b35';
-            skipBtn.style.transform = 'scale(1.05)';
-        };
-        skipBtn.onmouseout = () => {
-            skipBtn.style.background = 'rgba(255, 107, 53, 0.8)';
-            skipBtn.style.transform = 'scale(1)';
-        };
+        return new Promise(async (resolve) => {
+            const overlay = this.createOverlay();
+            
+            // Add Begin Challenge Button
+            const skipBtn = document.createElement('button');
+            skipBtn.id = 'skip-intro-btn';
+            skipBtn.innerHTML = '🎮 Begin Challenge';
 
-        skipBtn.onclick = async () => {
-            if (this.voiceManager) {
-                this.voiceManager.stop();
+            const cleanup = () => {
+                if (this.voiceManager) {
+                    this.voiceManager.stop();
+                }
+                if (this.soundManager) this.soundManager.playClick();
+                if (overlay && overlay.parentNode) overlay.remove();
+                if (skipBtn && skipBtn.parentNode) skipBtn.remove();
+                resolve();
+            };
+
+            skipBtn.onclick = cleanup;
+            document.body.appendChild(skipBtn);
+
+            // Calculate team composition for display
+            const playerCount = this.players.length;
+            const badTeamCount = this.players.filter(p => p.team === 'bad').length;
+            const goodTeamCount = this.players.filter(p => p.team === 'good').length;
+            
+            // Determine team reveal info based on player count
+            let teamRevealInfo = "";
+            if (playerCount === 6 || playerCount === 7) {
+                teamRevealInfo = `<div style="background: rgba(255, 0, 0, 0.15); border: 2px solid #ff0000; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h4 style="color: #ff0000; margin-bottom: 10px;">🤝 Special Alliance Rule</h4>
+                    <p style="color: #ffffff; font-size: 1.1rem;">With ${playerCount} players, Bad Team members know each other's identities for strategic balance.</p>
+                </div>`;
+            } else if (playerCount === 3 || playerCount === 4) {
+                teamRevealInfo = `<div style="background: rgba(255, 255, 0, 0.15); border: 2px solid #ffaa00; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h4 style="color: #ffaa00; margin-bottom: 10px;">🔒 Standard Rules</h4>
+                    <p style="color: #ffffff; font-size: 1.1rem;">With ${playerCount} players, all team identities remain completely secret. Trust no one!</p>
+                </div>`;
+            } else if (playerCount === 5 || playerCount === 8) {
+                teamRevealInfo = `<div style="background: rgba(255, 255, 0, 0.15); border: 2px solid #ffaa00; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h4 style="color: #ffaa00; margin-bottom: 10px;">🔒 Secret Identities Rule</h4>
+                    <p style="color: #ffffff; font-size: 1.1rem;">With ${playerCount} players, Bad Team members remain unknown to each other for maximum chaos.</p>
+                </div>`;
             }
-            if (this.soundManager) this.soundManager.playClick();
-
-            // Store references before removing elements
-            const currentOverlay = overlay;
-            const currentSkipBtn = skipBtn;
-
-            // Remove elements
-            if (currentOverlay && currentOverlay.parentNode) {
-                currentOverlay.remove();
-            }
-            if (currentSkipBtn && currentSkipBtn.parentNode) {
-                currentSkipBtn.remove();
-            }
-        };
-        
-        document.body.appendChild(skipBtn);
-
-        // Calculate team composition for display
-        const playerCount = this.players.length;
-        const badTeamCount = this.players.filter(p => p.team === 'bad').length;
-        const goodTeamCount = this.players.filter(p => p.team === 'good').length;
-        
-        // Determine team reveal info based on player count
-        let teamRevealInfo = "";
-        if (playerCount === 6 || playerCount === 7) {
-            teamRevealInfo = `<div style="background: rgba(255, 0, 0, 0.15); border: 2px solid #ff0000; border-radius: 15px; padding: 20px; margin: 20px 0;">
-                <h4 style="color: #ff0000; margin-bottom: 10px;">🤝 Special Alliance Rule</h4>
-                <p style="color: #ffffff; font-size: 1.1rem;">With ${playerCount} players, Bad Team members know each other's identities for strategic balance.</p>
-            </div>`;
-        } else if (playerCount === 3 || playerCount === 4) {
-            teamRevealInfo = `<div style="background: rgba(255, 255, 0, 0.15); border: 2px solid #ffaa00; border-radius: 15px; padding: 20px; margin: 20px 0;">
-                <h4 style="color: #ffaa00; margin-bottom: 10px;">🔒 Standard Rules</h4>
-                <p style="color: #ffffff; font-size: 1.1rem;">With ${playerCount} players, all team identities remain completely secret. Trust no one!</p>
-            </div>`;
-        } else if (playerCount === 5 || playerCount === 8) {
-            teamRevealInfo = `<div style="background: rgba(255, 255, 0, 0.15); border: 2px solid #ffaa00; border-radius: 15px; padding: 20px; margin: 20px 0;">
-                <h4 style="color: #ffaa00; margin-bottom: 10px;">🔒 Secret Identities Rule</h4>
-                <p style="color: #ffffff; font-size: 1.1rem;">With ${playerCount} players, Bad Team members remain unknown to each other for maximum chaos.</p>
-            </div>`;
-        }
-        
-        overlay.innerHTML = `
-            <div style="text-align: center; max-width: 900px; margin: 0 auto;">
-                <h1 style="font-family: 'Cinzel', serif; font-size: 3.5rem; color: #ff6b35; margin-bottom: 30px;">
-                    🎯 DECEPTION DUEL CHALLENGE 🎯
-                </h1>
-                
-                <div style="background: rgba(255, 107, 53, 0.2); padding: 40px; border-radius: 25px; margin: 40px 0;">
-                    <h3 style="color: #ff6b35; font-size: 2rem; margin-bottom: 25px;">⚡ First-to-Target Victory</h3>
-                    <div style="text-align: left; font-size: 1.3rem; color: #ffffff; line-height: 1.8;">
-                        <p><strong>Objective:</strong> First team to reach their target score wins instantly!</p>
-                        <p><strong>Gameplay:</strong> Continuous turns with rotating Team Leaders</p>
-                        <p><strong>Strategy:</strong> Every point matters - tension builds to the finale</p>
-                    </div>
-                </div>
-
-                <div style="background: rgba(0, 255, 255, 0.15); border: 2px solid #00ffff; border-radius: 20px; padding: 30px; margin: 30px 0;">
-                    <h3 style="color: #00ffff; font-size: 2rem; margin-bottom: 20px;">👥 Team Composition (${playerCount} Players)</h3>
-                    <div style="display: flex; justify-content: center; gap: 40px; margin: 20px 0;">
-                        <div style="text-align: center;">
-                            <div style="background: rgba(0, 255, 0, 0.2); border: 2px solid #00ff00; border-radius: 15px; padding: 20px; min-width: 120px;">
-                                <h4 style="color: #00ff00; margin-bottom: 10px;">😇 GOOD TEAM</h4>
-                                <div style="font-size: 3rem; color: #00ff00; margin: 10px 0;">${goodTeamCount}</div>
-                                <p style="color: #ffffff; font-size: 1rem;">Players</p>
-                            </div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="background: rgba(255, 0, 0, 0.2); border: 2px solid #ff0000; border-radius: 15px; padding: 20px; min-width: 120px;">
-                                <h4 style="color: #ff0000; margin-bottom: 10px;">😈 BAD TEAM</h4>
-                                <div style="font-size: 3rem; color: #ff0000; margin: 10px 0;">${badTeamCount}</div>
-                                <p style="color: #ffffff; font-size: 1rem;">Players</p>
-                            </div>
-                        </div>
-                    </div>
+            
+            overlay.innerHTML = `
+                <div style="text-align: center; max-width: 900px; margin: 0 auto;">
+                    <h1 style="font-family: 'Cinzel', serif; font-size: 3.5rem; color: #ff6b35; margin-bottom: 30px;">
+                        🎯 DECEPTION DUEL CHALLENGE 🎯
+                    </h1>
                     
-                    ${teamRevealInfo}
-                </div>
-                
-                <div style="background: rgba(255, 215, 0, 0.2); border: 3px solid #ffd700; border-radius: 20px; padding: 30px; margin: 30px 0;">
-                    <h3 style="color: #ffd700; font-size: 2rem; margin-bottom: 20px;">🏆 WIN CONDITIONS</h3>
-                    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
-                        <div style="text-align: center; flex: 1;">
-                            <div style="background: rgba(0, 255, 0, 0.3); border: 2px solid #00ff00; border-radius: 15px; padding: 25px; margin: 0 10px;">
-                                <h4 style="color: #00ff00; font-size: 1.8rem; margin-bottom: 15px;">😇 GOOD TEAM</h4>
-                                <div style="font-size: 4rem; color: #00ff00; margin: 15px 0;">${this.winThresholds.good}</div>
-                                <p style="color: #ffffff; font-size: 1.2rem; font-weight: bold;">Points to Win</p>
+                    <div style="background: rgba(255, 107, 53, 0.2); padding: 40px; border-radius: 25px; margin: 40px 0;">
+                        <h3 style="color: #ff6b35; font-size: 2rem; margin-bottom: 25px;">⚡ First-to-Target Victory</h3>
+                        <div style="text-align: left; font-size: 1.3rem; color: #ffffff; line-height: 1.8;">
+                            <p><strong>Objective:</strong> First team to reach their target score wins instantly!</p>
+                            <p><strong>Gameplay:</strong> Continuous turns with rotating Team Leaders</p>
+                            <p><strong>Strategy:</strong> Every point matters - tension builds to the finale</p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(0, 255, 255, 0.15); border: 2px solid #00ffff; border-radius: 20px; padding: 30px; margin: 30px 0;">
+                        <h3 style="color: #00ffff; font-size: 2rem; margin-bottom: 20px;">👥 Team Composition (${playerCount} Players)</h3>
+                        <div style="display: flex; justify-content: center; gap: 40px; margin: 20px 0;">
+                            <div style="text-align: center;">
+                                <div style="background: rgba(0, 255, 0, 0.2); border: 2px solid #00ff00; border-radius: 15px; padding: 20px; min-width: 120px;">
+                                    <h4 style="color: #00ff00; margin-bottom: 10px;">😇 GOOD TEAM</h4>
+                                    <div style="font-size: 3rem; color: #00ff00; margin: 10px 0;">${goodTeamCount}</div>
+                                    <p style="color: #ffffff; font-size: 1rem;">Players</p>
+                                </div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="background: rgba(255, 0, 0, 0.2); border: 2px solid #ff0000; border-radius: 15px; padding: 20px; min-width: 120px;">
+                                    <h4 style="color: #ff0000; margin-bottom: 10px;">😈 BAD TEAM</h4>
+                                    <div style="font-size: 3rem; color: #ff0000; margin: 10px 0;">${badTeamCount}</div>
+                                    <p style="color: #ffffff; font-size: 1rem;">Players</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div style="text-align: center; flex: 1;">
-                            <div style="background: rgba(255, 0, 0, 0.3); border: 2px solid #ff0000; border-radius: 15px; padding: 25px; margin: 0 10px;">
-                                <h4 style="color: #ff0000; font-size: 1.8rem; margin-bottom: 15px;">😈 BAD TEAM</h4>
-                                <div style="font-size: 4rem; color: #ff0000; margin: 15px 0;">${this.winThresholds.bad}</div>
-                                <p style="color: #ffffff; font-size: 1.2rem; font-weight: bold;">Points to Win</p>
+                        ${teamRevealInfo}
+                    </div>
+                    
+                    <div style="background: rgba(255, 215, 0, 0.2); border: 3px solid #ffd700; border-radius: 20px; padding: 30px; margin: 30px 0;">
+                        <h3 style="color: #ffd700; font-size: 2rem; margin-bottom: 20px;">🏆 WIN CONDITIONS</h3>
+                        <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                            <div style="text-align: center; flex: 1;">
+                                <div style="background: rgba(0, 255, 0, 0.3); border: 2px solid #00ff00; border-radius: 15px; padding: 25px; margin: 0 10px;">
+                                    <h4 style="color: #00ff00; font-size: 1.8rem; margin-bottom: 15px;">😇 GOOD TEAM</h4>
+                                    <div style="font-size: 4rem; color: #00ff00; margin: 15px 0;">${this.winThresholds.good}</div>
+                                    <p style="color: #ffffff; font-size: 1.2rem; font-weight: bold;">Points to Win</p>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; flex: 1;">
+                                <div style="background: rgba(255, 0, 0, 0.3); border: 2px solid #ff0000; border-radius: 15px; padding: 25px; margin: 0 10px;">
+                                    <h4 style="color: #ff0000; font-size: 1.8rem; margin-bottom: 15px;">😈 BAD TEAM</h4>
+                                    <div style="font-size: 4rem; color: #ff0000; margin: 15px 0;">${this.winThresholds.bad}</div>
+                                    <p style="color: #ffffff; font-size: 1.2rem; font-weight: bold;">Points to Win</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-around; margin: 40px 0;">
-                    <div style="background: rgba(0, 255, 0, 0.2); border: 2px solid #00ff00; border-radius: 20px; padding: 30px; flex: 1; margin: 0 10px;">
-                        <h3 style="color: #00ff00; font-size: 1.8rem; margin-bottom: 15px;">😇 CURRENT</h3>
-                        <div style="font-size: 3rem; margin: 15px 0;">${this.gameScore.goodTeam} / ${this.winThresholds.good}</div>
-                        <p style="color: #ffffff; font-size: 1.1rem;">Progress to Victory</p>
+                    
+                    <div style="display: flex; justify-content: space-around; margin: 40px 0;">
+                        <div style="background: rgba(0, 255, 0, 0.2); border: 2px solid #00ff00; border-radius: 20px; padding: 30px; flex: 1; margin: 0 10px;">
+                            <h3 style="color: #00ff00; font-size: 1.8rem; margin-bottom: 15px;">😇 CURRENT</h3>
+                            <div style="font-size: 3rem; margin: 15px 0;">${this.gameScore.goodTeam} / ${this.winThresholds.good}</div>
+                            <p style="color: #ffffff; font-size: 1.1rem;">Progress to Victory</p>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 0, 0.2); border: 2px solid #ffaa00; border-radius: 20px; padding: 30px; flex: 1; margin: 0 10px;">
+                            <h3 style="color: #ffaa00; font-size: 1.8rem; margin-bottom: 15px;">🤝 TIES</h3>
+                            <div style="font-size: 3rem; margin: 15px 0;">${this.gameScore.ties}</div>
+                            <p style="color: #ffffff; font-size: 1.1rem;">Special rewards at 3 & 4</p>
+                        </div>
+                        
+                        <div style="background: rgba(255, 0, 0, 0.2); border: 2px solid #ff0000; border-radius: 20px; padding: 30px; flex: 1; margin: 0 10px;">
+                            <h3 style="color: #ff0000; font-size: 1.8rem; margin-bottom: 15px;">😈 CURRENT</h3>
+                            <div style="font-size: 3rem; margin: 15px 0;">${this.gameScore.badTeam} / ${this.winThresholds.bad}</div>
+                            <p style="color: #ffffff; font-size: 1.1rem;">Progress to Victory</p>
+                        </div>
                     </div>
                     
-                    <div style="background: rgba(255, 255, 0, 0.2); border: 2px solid #ffaa00; border-radius: 20px; padding: 30px; flex: 1; margin: 0 10px;">
-                        <h3 style="color: #ffaa00; font-size: 1.8rem; margin-bottom: 15px;">🤝 TIES</h3>
-                        <div style="font-size: 3rem; margin: 15px 0;">${this.gameScore.ties}</div>
-                        <p style="color: #ffffff; font-size: 1.1rem;">Special rewards at 3 & 4</p>
-                    </div>
-                    
-                    <div style="background: rgba(255, 0, 0, 0.2); border: 2px solid #ff0000; border-radius: 20px; padding: 30px; flex: 1; margin: 0 10px;">
-                        <h3 style="color: #ff0000; font-size: 1.8rem; margin-bottom: 15px;">😈 CURRENT</h3>
-                        <div style="font-size: 3rem; margin: 15px 0;">${this.gameScore.badTeam} / ${this.winThresholds.bad}</div>
-                        <p style="color: #ffffff; font-size: 1.1rem;">Progress to Victory</p>
+                    <div style="background: rgba(255, 255, 0, 0.15); border: 2px solid #ffaa00; border-radius: 20px; padding: 30px; margin: 30px 0;">
+                        <h3 style="color: #ffaa00; font-size: 1.8rem; margin-bottom: 20px;">⚖️ Strategic Rules</h3>
+                        <div style="text-align: left; font-size: 1.2rem; color: #ffffff;">
+                            <p>• Team Leaders cannot select the same player back-to-back</p>
+                            <p>• No player may participate in consecutive rounds</p>
+                            <p>• Random voting phases may activate for additional strategy</p>
+                            <p>• Game ends INSTANTLY when a team reaches their target</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div style="background: rgba(255, 255, 0, 0.15); border: 2px solid #ffaa00; border-radius: 20px; padding: 30px; margin: 30px 0;">
-                    <h3 style="color: #ffaa00; font-size: 1.8rem; margin-bottom: 20px;">⚖️ Strategic Rules</h3>
-                    <div style="text-align: left; font-size: 1.2rem; color: #ffffff;">
-                        <p>• Team Leaders cannot select the same player back-to-back</p>
-                        <p>• No player may participate in consecutive rounds</p>
-                        <p>• Random voting phases may activate for additional strategy</p>
-                        <p>• Game ends INSTANTLY when a team reaches their target</p>
-                    </div>
-                </div>
-                
-                <button id="start-challenge-btn" style="
-                    background: linear-gradient(135deg, #ff6b35, #f7931e);
-                    color: white;
-                    border: none;
-                    padding: 25px 60px;
-                    font-size: 1.8rem;
-                    border-radius: 20px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    box-shadow: 0 10px 25px rgba(255, 107, 53, 0.4);
-                    transition: all 0.3s ease;
-                ">
-                    🎮 Begin Challenge
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(overlay);
-        
-        // Enhanced voice announcement with win conditions (WITHOUT player introductions)
-        let challengeText = `Welcome to the Deception Duel Challenge with ${playerCount} players! `;
-        challengeText += `Team composition: ${goodTeamCount} Good Team players versus ${badTeamCount} Bad Team players. `;
-        challengeText += `Win conditions: Good Team needs ${this.winThresholds.good} points, Bad Team needs ${this.winThresholds.bad} points. `;
-        challengeText += `First team to reach their target wins instantly! Every point matters in this strategic battle! `;
-        challengeText += ` Good luck to all players!`;
-        
-        if (this.voiceManager) {
-            await this.voiceManager.speak(challengeText);
-        }
-        
-        const startBtn = document.getElementById('start-challenge-btn');
-        if (startBtn) {
-            startBtn.onclick = async () => {
-                if (this.soundManager) this.soundManager.playClick();
-                if (overlay && overlay.parentNode) overlay.remove();
-                if (document.getElementById('skip-intro-btn')) {
-                    document.getElementById('skip-intro-btn').remove();
-                }
-            };
-        }
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Enhanced voice announcement with win conditions (WITHOUT player introductions)
+            let challengeText = `Welcome to the Deception Duel Challenge with ${playerCount} players! `;
+            challengeText += `Team composition: ${goodTeamCount} Good Team players versus ${badTeamCount} Bad Team players. `;
+            challengeText += `Win conditions: Good Team needs ${this.winThresholds.good} points, Bad Team needs ${this.winThresholds.bad} points. `;
+            challengeText += `First team to reach their target wins instantly! Every point matters in this strategic battle! `;
+            challengeText += ` Good luck to all players!`;
+            
+            if (this.voiceManager) {
+                await this.voiceManager.speak(challengeText);
+            }
+        });
     }
     
     // Replace round-based system with continuous gameplay
@@ -435,46 +375,45 @@ class RockPaperScissorsChallenge {
                 </h1>
                 
                 <div style="
-                    background: linear-gradient(135deg, ${this.teamLeader.color}40, ${this.teamLeader.color}20);
-                    border: 3px solid ${this.teamLeader.color};
-                    border-radius: 25px;
-                    padding: 40px;
-                    margin: 30px 0;
-                    box-shadow: 0 0 50px ${this.teamLeader.color}60;
+                    background: linear-gradient(135deg, ${this.teamLeader.color}30, ${this.teamLeader.color}15);
+                    border: 2px solid ${this.teamLeader.color};
+                    border-radius: 20px;
+                    padding: 20px;
+                    margin: 20px 0;
+                    box-shadow: 0 0 30px ${this.teamLeader.color}40;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 20px;
                 ">
                     <div style="
-                        width: 80px;
-                        height: 80px;
+                        width: 40px;
+                        height: 40px;
                         background: ${this.teamLeader.color};
                         border-radius: 50%;
-                        margin: 0 auto 20px auto;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 2.5rem;
-                        font-weight: bold;
-                        color: ${this.getContrastColor(this.teamLeader.color)};
-                    ">${this.players.indexOf(this.teamLeader) + 1}</div>
+                        box-shadow: 0 0 15px ${this.teamLeader.color}80;
+                        flex-shrink: 0;
+                    "></div>
                     
-                    <h2 style="color: #ffffff; font-size: 2.5rem; margin: 0;">
+                    <h2 style="color: #ffffff; font-size: 2rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${this.teamLeader.name}
                     </h2>
                 </div>
                 
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 25px; border-radius: 15px; margin: 30px 0;">
-                    <h3 style="color: #ffaa00; margin-bottom: 15px;">📊 Progress to Victory</h3>
-                    <div style="display: flex; justify-content: space-around;">
-                        <div style="text-align: center;">
-                            <span style="color: #00ff00; font-size: 1.3rem;">😇 Good</span><br/>
-                            <span style="color: #00ff00; font-size: 1.8rem; font-weight: bold;">${this.gameScore.goodTeam} / ${this.winThresholds.good}</span>
+                <div style="background: rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 15px; margin: 15px 0;">
+                    <h3 style="color: #ffaa00; margin-bottom: 15px; font-size: 1.1rem; text-transform: uppercase;">📊 Progress to Victory</h3>
+                    <div style="display: flex; justify-content: space-around; gap: 10px;">
+                        <div style="text-align: center; flex: 1;">
+                            <span style="color: #00ff00; font-size: 1rem;">😇 Good</span><br/>
+                            <span style="color: #00ff00; font-size: 1.5rem; font-weight: bold;">${this.gameScore.goodTeam}/${this.winThresholds.good}</span>
                         </div>
-                        <div style="text-align: center;">
-                            <span style="color: #ffaa00; font-size: 1.3rem;">🤝 Ties</span><br/>
-                            <span style="color: #ffaa00; font-size: 1.8rem; font-weight: bold;">${this.gameScore.ties}</span>
+                        <div style="text-align: center; flex: 1;">
+                            <span style="color: #ffaa00; font-size: 1rem;">🤝 Ties</span><br/>
+                            <span style="color: #ffaa00; font-size: 1.5rem; font-weight: bold;">${this.gameScore.ties}</span>
                         </div>
-                        <div style="text-align: center;">
-                            <span style="color: #ff0000; font-size: 1.3rem;">😈 Bad</span><br/>
-                            <span style="color: #ff0000; font-size: 1.8rem; font-weight: bold;">${this.gameScore.badTeam} / ${this.winThresholds.bad}</span>
+                        <div style="text-align: center; flex: 1;">
+                            <span style="color: #ff0000; font-size: 1rem;">😈 Bad</span><br/>
+                            <span style="color: #ff0000; font-size: 1.5rem; font-weight: bold;">${this.gameScore.badTeam}/${this.winThresholds.bad}</span>
                         </div>
                     </div>
                 </div>
@@ -483,17 +422,7 @@ class RockPaperScissorsChallenge {
                     Step forward to the console for your strategic decision.
                 </p>
                 
-                <button id="start-turn-btn" style="
-                    background: linear-gradient(135deg, #00ff00, #00cc00);
-                    color: white;
-                    border: none;
-                    padding: 20px 40px;
-                    font-size: 1.5rem;
-                    border-radius: 15px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    margin-top: 20px;
-                ">
+                <button id="start-turn-btn">
                     🎮 Start My Turn
                 </button>
             </div>
@@ -528,59 +457,64 @@ class RockPaperScissorsChallenge {
                     🤖 Team Leader's Strategic Console
                 </h1>
                 
-                <!-- AI's Secret Move Section -->
+                <!-- AI's Secret Move Section - Compact One-Line Mode -->
                 <div style="
-                    background: rgba(255, 107, 53, 0.2);
+                    background: rgba(255, 107, 53, 0.15);
                     border: 2px solid #ff6b35;
-                    border-radius: 20px;
-                    padding: 40px;
-                    margin: 30px 0;
+                    border-radius: 15px;
+                    padding: 15px 30px;
+                    margin: 15px 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 20px;
+                    box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
                 ">
-                    <h2 style="color: #ff6b35; font-size: 1.8rem; margin-bottom: 20px;">AI's Secret Move</h2>
-                    <div style="margin-bottom: 20px;">
-                        <img src="${this.getMoveImage(this.aiMove, false)}" style="width:120px; height:120px; object-fit:contain;" alt="AI Move">
-                    </div>
-                    <h3 style="color: #ff6b35; font-size: 2rem;">
-                        AI chose: ${this.aiMove.toUpperCase()}
+                    <h2 style="color: #ff6b35; font-size: 1.2rem; margin: 0;">🤖 AI Secret Move:</h2>
+                    <img src="${this.getMoveImage(this.aiMove, false)}" style="width:50px; height:50px; object-fit:contain; filter: drop-shadow(0 0 5px #ff6b35);" alt="AI Move">
+                    <h3 style="color: #ffffff; font-size: 1.5rem; margin: 0; letter-spacing: 2px; font-weight: 800;">
+                        ${this.aiMove.toUpperCase()}
                     </h3>
                 </div>
                 
                 <!-- Combined Selection Section -->
-                <div style="display: flex; gap: 40px; margin: 30px 0; justify-content: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 20px; margin: 15px 0; justify-content: center; flex-wrap: wrap; width: 100%;">
                     
-                    <!-- Player Selection -->
-                    <div style="flex: 1; min-width: 300px;">
-                        <h3 style="color: #ffffff; font-size: 1.5rem; margin-bottom: 20px;">👥 Choose Your Teammate</h3>
-                        <div id="player-selection" style="display: flex; flex-direction: column; gap: 15px;">
-                            ${this.renderPlayerSelection()}
-                        </div>
-                    </div>
-                    
-                    <!-- Suggestion Selection -->
-                    <div style="flex: 1; min-width: 300px;">
-                        <h3 style="color: #ffffff; font-size: 1.5rem; margin-bottom: 20px;">💭 Choose Your "Advice"</h3>
-                        <div id="move-selection" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Suggestion Selection (Advice) - Compact Horizontal Style -->
+                    <div style="width: 100%; background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 20px; order: -1;">
+                        <h3 style="color: #00ffff; font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">💭 Step 1: Choose Your "Advice"</h3>
+                        <div id="move-selection" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                             ${['rock', 'paper', 'scissors'].map(move => `
                                 <div class="move-suggestion" data-move="${move}" style="
-                                    background: rgba(255, 255, 255, 0.1);
-                                    border: 2px solid #ffffff;
+                                    background: rgba(255, 255, 255, 0.08);
+                                    border: 2px solid rgba(255, 255, 255, 0.3);
                                     border-radius: 15px;
-                                    padding: 20px;
+                                    padding: 10px 20px;
                                     cursor: pointer;
-                                    transition: all 0.3s ease;
+                                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                                     text-align: center;
                                     display: flex;
+                                    flex-direction: column;
                                     align-items: center;
-                                    gap: 20px;
+                                    gap: 10px;
+                                    min-width: 120px;
                                 ">
-                                    <div style="width:80px; height:80px;">
+                                    <div style="width:60px; height:60px;">
                                         <img src="${this.getMoveImage(move, true)}" style="width:100%; height:100%; object-fit:contain;" alt="${move}">
                                     </div>
-                                    <h4 style="color: #ffffff; margin: 0; text-transform: uppercase; flex: 1;">
+                                    <h4 style="color: #ffffff; margin: 0; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">
                                         ${move}
                                     </h4>
                                 </div>
                             `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Player Selection -->
+                    <div style="flex: 1; min-width: 300px; padding: 10px;">
+                        <h3 style="color: #ffffff; font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">👥 Step 2: Choose Your Teammate</h3>
+                        <div id="player-selection" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
+                            ${this.renderPlayerSelection()}
                         </div>
                     </div>
                 </div>
@@ -598,19 +532,7 @@ class RockPaperScissorsChallenge {
                 </div>
                 
                 <!-- Confirm Button -->
-                <button id="confirm-selections-btn" style="
-                    background: linear-gradient(135deg, #00ff00, #00cc00);
-                    color: white;
-                    border: none;
-                    padding: 20px 40px;
-                    font-size: 1.3rem;
-                    border-radius: 15px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    margin-top: 20px;
-                    opacity: 0.5;
-                    pointer-events: none;
-                " disabled>
+                <button id="confirm-selections-btn" disabled>
                     ✅ Confirm Both Selections
                 </button>
                 
@@ -642,35 +564,23 @@ class RockPaperScissorsChallenge {
                 
                 return `
                     <div class="teammate-option ${isDisabled ? 'disabled' : ''}" data-player="${playerIndex}" style="
-                        background: linear-gradient(135deg, ${player.color}30, ${player.color}50);
-                        border: 2px solid ${isDisabled ? '#666666' : player.color};
-                        border-radius: 15px;
-                        padding: 20px;
+                        background: linear-gradient(135deg, ${player.color}25, ${player.color}40);
+                        border: 2px solid ${isDisabled ? '#444444' : player.color};
+                        border-radius: 12px;
+                        padding: 10px 15px;
                         cursor: ${isDisabled ? 'not-allowed' : 'pointer'};
                         transition: all 0.3s ease;
-                        opacity: ${isDisabled ? '0.5' : '1'};
+                        opacity: ${isDisabled ? '0.4' : '1'};
                         position: relative;
                         display: flex;
                         align-items: center;
-                        gap: 20px;
-                        text-align: left;
+                        justify-content: center;
+                        gap: 12px;
+                        text-align: center;
                     ">
-                        <div style="
-                            width: 50px;
-                            height: 50px;
-                            background: ${isDisabled ? '#666666' : player.color};
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 1.5rem;
-                            font-weight: bold;
-                            color: ${this.getContrastColor(isDisabled ? '#666666' : player.color)};
-                            flex-shrink: 0;
-                        ">${playerIndex + 1}</div>
-                        <div style="flex: 1;">
-                            <h4 style="color: #ffffff; margin: 0; font-size: 1.2rem;">${player.name}</h4>
-                            ${isDisabled ? '<p style="color: #ff6666; font-size: 0.9rem; margin: 5px 0 0 0;">Participated last turn</p>' : ''}
+                        <div style="flex: 1; overflow: hidden;">
+                            <h4 style="color: #ffffff; margin: 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 800;">${player.name}</h4>
+                            ${isDisabled ? '<p style="color: #ff4444; font-size: 0.75rem; margin: 2px 0 0 0;">(Locked)</p>' : ''}
                         </div>
                     </div>
                 `;
@@ -1230,18 +1140,7 @@ class RockPaperScissorsChallenge {
                     `).join('')}
                 </div>
                 
-                <button id="confirm-choice-btn" style="
-                    background: linear-gradient(135deg, #00ff00, #00cc00);
-                    color: white;
-                    border: none;
-                    padding: 20px 40px;
-                    font-size: 1.3rem;
-                    border-radius: 15px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    margin-top: 20px;
-                    opacity: 0.5;
-                " disabled>
+                <button id="confirm-choice-btn" disabled>
                     ✅ Confirm Choice
                 </button>
             </div>
@@ -1333,8 +1232,6 @@ class RockPaperScissorsChallenge {
                 
                 // Pre-build the battle HTML structure - minimalistic design focused on hands
                 battleOverlay.innerHTML = `
-                    <h1 style="color:#333333; font-size:5rem; margin-bottom:20px; font-family:'Cinzel', serif; letter-spacing:10px; opacity:0.3; transition:opacity 0.5s ease;" id="arena-title">ARENA</h1>
-                    
                     <div id="battle-arena" style="width:100%; display:flex; justify-content:space-around; align-items:center; position:relative; z-index:2; margin-bottom:20px; opacity:0; transition:opacity 0.5s ease 0.3s;">
                         <div id="player-hand" style="width:200px; height:200px; opacity:0;">
                             <img src="${this.getMoveImage('rock', true)}" style="width:100%; height:100%; object-fit:contain;" alt="Player">
@@ -1342,7 +1239,7 @@ class RockPaperScissorsChallenge {
                         
                         <div style="text-align:center; min-width:200px; opacity:0; transition:opacity 0.5s ease 0.5s;" id="center-area">
                             <div id="vs-text" style="font-size:5rem; color:#ffaa00; font-family:'Cinzel', serif; margin-bottom:20px;">VS</div>
-                            <div id="rps-text" style="font-family:'Cinzel', serif; font-size:4rem; font-weight:bold; color:#ffffff; text-shadow:0 0 30px rgba(255,107,53,0.8);">Rock</div>
+                            <div id="rps-text" style="font-family:'Cinzel', serif; font-size:4rem; font-weight:bold; color:#ffffff; text-shadow:0 0 30px rgba(255,107,53,0.8);"></div>
                         </div>
                         
                         <div id="ai-hand" style="width:200px; height:200px; opacity:0;">
@@ -1363,7 +1260,6 @@ class RockPaperScissorsChallenge {
                 battleOverlay.style.opacity = '1';
                 
                 // Show arena elements progressively
-                document.getElementById('arena-title').style.opacity = '1';
                 document.getElementById('battle-arena').style.opacity = '1';
                 document.getElementById('center-area').style.opacity = '1';
                 document.getElementById('player-hand').style.opacity = '1';
@@ -1418,7 +1314,7 @@ class RockPaperScissorsChallenge {
         const totalDuration = 3 * swingDuration;
         const startTime = Date.now();
         const words = ['Rock', 'Paper', 'Scissors', 'SHOOT!'];
-        let currentWordIndex = 0;
+        let currentWordIndex = -1; // Initialize to -1 to catch the first "Rock" (index 0)
         let revealed = false; // Track if we've revealed the moves
         
         return new Promise((resolve) => {
@@ -1527,12 +1423,7 @@ class RockPaperScissorsChallenge {
                 requestAnimationFrame(animate);
             };
             
-            // Show first word immediately
-            rpsTextEl.textContent = words[0];
-            if (this.soundManager) this.soundManager.playCountdownBeep(1);
-            rpsTextEl.style.transform = 'scale(1.15)';
-            setTimeout(() => { rpsTextEl.style.transform = 'scale(1)'; }, 200);
-            
+            // Start the logic loop
             animate();
             
             const showResult = () => {
@@ -2260,20 +2151,20 @@ class RockPaperScissorsChallenge {
         
         // Available colors mapping
         const colorNameToHex = {
-            'Red': '#ff0000',
-            'Green': '#00ff00',
-            'Blue': '#0080ff',
-            'Yellow': '#ffff00',
-            'Orange': '#ff8000',
-            'Purple': '#8000ff',
-            'Pink': '#ff0080',
-            'Cyan': '#00ff80'
+            'Red': { hex: '#ff0000', emoji: '🔴' },
+            'Green': { hex: '#00ff00', emoji: '🟢' },
+            'Blue': { hex: '#0080ff', emoji: '🔵' },
+            'Yellow': { hex: '#ffff00', emoji: '🟡' },
+            'Orange': { hex: '#ff8000', emoji: '🟠' },
+            'Purple': { hex: '#8000ff', emoji: '🟣' },
+            'Pink': { hex: '#ff0080', emoji: '🌸' },
+            'Cyan': { hex: '#00ff80', emoji: '💎' }
         };
         
         const playerCount = savedPlayers.length;
         const selectedColors = [...savedPlayers];
         
-        // Create the color selection UI with saved data
+        // Create the color selection UI with saved data (Using Dropdown)
         let colorGridHTML = '';
         for (let i = 0; i < playerCount; i++) {
             const savedPlayer = savedPlayers[i];
@@ -2282,7 +2173,6 @@ class RockPaperScissorsChallenge {
             colorGridHTML += `
                 <div class="player-color-row">
                     <div class="player-name-section">
-                        <label for="player-${i + 1}-name">Player ${i + 1}:</label>
                         <input type="text" 
                                id="player-${i + 1}-name" 
                                class="player-name-input" 
@@ -2290,15 +2180,14 @@ class RockPaperScissorsChallenge {
                                value="${savedPlayer.name}"
                                maxlength="20">
                     </div>
-                    <div class="color-options" data-player="${i}">
-                        ${Object.entries(colorNameToHex).map(([name, hex]) => `
-                            <div class="color-option ${hex === savedHex ? 'selected' : ''}" 
-                                 data-color="${hex}" 
-                                 data-name="${name}"
-                                 style="background-color: ${hex};"
-                                 title="${name}">
-                            </div>
-                        `).join('')}
+                    <div class="color-dropdown-section">
+                        <select class="color-select" data-player="${i}">
+                            ${Object.entries(colorNameToHex).map(([name, info]) => `
+                                <option value="${info.hex}" data-name="${name}" ${info.hex === savedHex ? 'selected' : ''}>
+                                    ${info.emoji} ${name.toUpperCase()}
+                                </option>
+                            `).join('')}
+                        </select>
                     </div>
                 </div>
             `;
@@ -2310,23 +2199,28 @@ class RockPaperScissorsChallenge {
         confirmButton.style.display = 'block';
         confirmButton.disabled = false;
         
-        // Add event listeners for color selection
-        colorGrid.addEventListener('click', (e) => {
-            if (e.target.classList.contains('color-option')) {
-                const playerIndex = parseInt(e.target.closest('.color-options').dataset.player);
-                const color = e.target.dataset.color;
-                const colorName = e.target.dataset.name;
+        // Add event listeners for dropdown selection
+        colorGrid.querySelectorAll('.color-select').forEach(select => {
+            const updateSelectStyle = (el) => {
+                const color = el.value;
+                el.style.backgroundColor = color;
+                // Simple contrasting color
+                const r = parseInt(color.substr(1,2),16);
+                const g = parseInt(color.substr(3,2),16);
+                const b = parseInt(color.substr(5,2),16);
+                const l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                el.style.color = l > 0.5 ? '#000000' : '#ffffff';
+                el.style.borderColor = color;
+            };
+
+            // Initial style
+            updateSelectStyle(select);
+
+            select.addEventListener('change', (e) => {
+                const playerIndex = parseInt(select.dataset.player);
+                const color = select.value;
+                const colorName = select.options[select.selectedIndex].dataset.name;
                 const nameInput = document.getElementById(`player-${playerIndex + 1}-name`);
-                
-                // Check if color is already selected by another player
-                const isColorTaken = selectedColors.some((selected, index) => 
-                    selected && selected.color === color && index !== playerIndex
-                );
-                
-                if (isColorTaken) {
-                    if (this.soundManager) this.soundManager.playWarning();
-                    return;
-                }
                 
                 // Update selected colors
                 selectedColors[playerIndex] = {
@@ -2337,27 +2231,25 @@ class RockPaperScissorsChallenge {
                 
                 if (this.soundManager) this.soundManager.playSelect();
                 
-                // Update visual states
-                document.querySelectorAll('.color-option').forEach(opt => {
-                    const optColor = opt.dataset.color;
-                    const optPlayerIndex = parseInt(opt.closest('.color-options').dataset.player);
-                    const isSelectedByThisPlayer = selectedColors[optPlayerIndex]?.color === optColor;
-                    const isSelectedByOtherPlayer = selectedColors.some((sc, idx) => 
-                        idx !== optPlayerIndex && sc?.color === optColor
-                    );
-                    
-                    if (isSelectedByThisPlayer) {
-                        opt.classList.add('selected');
-                        opt.classList.remove('disabled');
-                    } else if (isSelectedByOtherPlayer) {
-                        opt.classList.remove('selected');
-                        opt.classList.add('disabled');
-                    } else {
-                        opt.classList.remove('selected');
-                        opt.classList.remove('disabled');
-                    }
+                // Update all dropdowns to hide newly selected color
+                colorGrid.querySelectorAll('.color-select').forEach(s => {
+                    const sIndex = parseInt(s.dataset.player);
+                    const sValue = s.value;
+                    Array.from(s.options).forEach(opt => {
+                        const isTakenByOther = selectedColors.some((sc, idx) => 
+                            idx !== sIndex && sc && sc.color === opt.value
+                        );
+                        if (isTakenByOther && opt.value !== sValue) {
+                            opt.disabled = true;
+                            opt.style.display = 'none';
+                        } else {
+                            opt.disabled = false;
+                            opt.style.display = 'block';
+                        }
+                    });
+                    updateSelectStyle(s);
                 });
-            }
+            });
         });
         
         // Add event listeners for name inputs

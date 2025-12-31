@@ -8,6 +8,13 @@ class VoiceManager {
     constructor() {
         // Voice service configuration
         this.voiceServices = {
+            free_neural: {
+                enabled: true,
+                provider: 'streamelements', // Amazon Polly via StreamElements
+                voiceName: 'Amy', // High quality realistic female
+                rate: 1.0,
+                pitch: 1.0
+            },
             elevenlabs: {
                 enabled: false,
                 apiKey: null,
@@ -68,6 +75,13 @@ class VoiceManager {
     async initializeVoiceServices() {
         await this.detectApiKeys();
         
+        // Load saved free neural voice preference
+        const savedFreeVoice = localStorage.getItem('free_neural_voice_name');
+        if (savedFreeVoice) {
+            this.voiceServices.free_neural.voiceName = savedFreeVoice;
+            console.log(`🎭 Loaded saved Free Neural voice: ${savedFreeVoice}`);
+        }
+
         if (this.voiceServices.elevenlabs.enabled) console.log('🎭 ElevenLabs enabled');
         if (this.voiceServices.azure.enabled) console.log('🎭 Azure Neural enabled');
         if (this.voiceServices.google.enabled) console.log('🎭 Google WaveNet enabled');
@@ -218,11 +232,15 @@ class VoiceManager {
                 return this.playCachedAudio(textHash);
             }
             
-            // Try premium services first, then fallback to browser
-            const services = ['elevenlabs', 'azure', 'google', 'browser'];
+            // Try premium services first, then our high-quality free neural, then fallback to browser
+            const services = ['elevenlabs', 'azure', 'google', 'free_neural', 'browser'];
             
             for (let service of services) {
-                if (service === 'browser' || this.voiceServices[service]?.enabled) {
+                // If it's a premium service, check if it's enabled (has key)
+                // If it's free_neural or browser, they are always "available" but may fail
+                const isAvailable = service === 'browser' || service === 'free_neural' || this.voiceServices[service]?.enabled;
+                
+                if (isAvailable) {
                     try {
                         switch (service) {
                             case 'elevenlabs':
@@ -231,17 +249,62 @@ class VoiceManager {
                                 return await this.speakAzure(text, options);
                             case 'google':
                                 return await this.speakGoogle(text, options);
+                            case 'free_neural':
+                                return await this.speakFreeNeural(text, options);
                             case 'browser':
                                 return await this.speakBrowser(text, options);
                         }
                     } catch (error) {
                         console.warn(`🎤 ${service} synthesis failed:`, error.message);
+                        // If free_neural fails (e.g. offline), it will automatically try 'browser' next
                         continue;
                     }
                 }
             }
         } catch (error) {
             console.error('🎤 Voice synthesis failure:', error);
+        }
+    }
+
+    /**
+     * High-quality Free Neural AI Voices (Amazon Polly / Microsoft Edge)
+     * Provides consistent, modern realism across all platforms for free
+     */
+    async speakFreeNeural(text, options = {}) {
+        const config = this.voiceServices.free_neural;
+        const voice = options.voice || config.voiceName;
+        
+        try {
+            // Encode text for URL
+            const encodedText = encodeURIComponent(text);
+            let url = '';
+            
+            if (config.provider === 'streamelements') {
+                // StreamElements API provides access to Amazon Polly Neural voices for free
+                url = `https://api.streamelements.com/v2/voice/speak?voice=${voice}&text=${encodedText}`;
+            } else if (config.provider === 'google') {
+                url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=${encodedText}`;
+            }
+            
+            if (!url) throw new Error('No free neural provider configured');
+
+            // Safety timeout for fetching
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) throw new Error(`Free Neural API error: ${response.status}`);
+            
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            console.log(`🎤 Using Free Neural AI Voice: ${voice}`);
+            return this.playAndCacheAudio(audioUrl, this.hashText(text));
+        } catch (error) {
+            console.warn('🎤 Free Neural synthesis failed:', error);
+            throw error; // Fallback to next service in speak()
         }
     }
     

@@ -198,20 +198,10 @@ class RoleManager {
             
             <div style="margin-top: 40px;">
                 <button id="skip-instructions-btn" style="
-                    padding: 15px 30px;
-                    font-family: 'Cinzel', serif;
-                    font-size: 1.2rem;
                     background: linear-gradient(45deg, #666666, #444444);
                     color: #ffffff;
                     border: none;
                     border-radius: 10px;
-                    cursor: pointer;
-                    font-weight: 500;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-                    transition: all 0.3s ease;
-                    min-height: 50px;
                     opacity: 0.7;
                 " title="Skip voice instructions and proceed directly">
                     ⏭️ Skip Instructions
@@ -336,20 +326,14 @@ class RoleManager {
             </p>
             
             <button id="ready-btn" style="
-                padding: 25px 50px;
-                font-family: 'Cinzel', serif;
-                font-size: 1.8rem;
                 background: linear-gradient(45deg, ${currentPlayer.color}, ${currentPlayer.color}cc);
                 color: #ffffff;
                 border: none;
                 border-radius: 20px;
-                cursor: pointer;
                 font-weight: 700;
                 letter-spacing: 3px;
                 text-transform: uppercase;
                 box-shadow: 0 10px 30px ${currentPlayer.color}60;
-                transition: all 0.3s ease;
-                min-height: 80px;
                 text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             ">
                 🎯 READY
@@ -477,20 +461,14 @@ class RoleManager {
             
             <div style="margin-top: 50px;">
                 <button id="continue-btn" style="
-                    padding: 20px 40px;
-                    font-family: 'Cinzel', serif;
-                    font-size: 1.4rem;
                     background: linear-gradient(45deg, #4444ff, #2222cc);
                     color: #ffffff;
                     border: none;
                     border-radius: 15px;
-                    cursor: pointer;
                     font-weight: 600;
                     letter-spacing: 2px;
                     text-transform: uppercase;
                     box-shadow: 0 8px 25px rgba(68, 68, 255, 0.4);
-                    transition: all 0.3s ease;
-                    min-height: 60px;
                 ">
                     🔄 Continue
                 </button>
@@ -575,20 +553,14 @@ class RoleManager {
             </p>
             
             <button id="finish-btn" style="
-                padding: 20px 40px;
-                font-family: 'Cinzel', serif;
-                font-size: 1.4rem;
                 background: linear-gradient(45deg, #888888, #666666);
                 color: #ffffff;
                 border: none;
                 border-radius: 15px;
-                cursor: pointer;
                 font-weight: 600;
                 letter-spacing: 2px;
                 text-transform: uppercase;
                 box-shadow: 0 8px 25px rgba(136, 136, 136, 0.4);
-                transition: all 0.3s ease;
-                min-height: 60px;
             ">
                 ✅ Finish
             </button>

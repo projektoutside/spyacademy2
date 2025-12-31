@@ -129,22 +129,14 @@ class FirstImpressionsChallenge {
             
             <div style="margin-top: 40px;">
                 <button id="begin-impressions-btn" style="
-                    padding: ${this.isMobile ? '15px 35px' : '20px 50px'};
-                    font-family: 'Cinzel', serif;
-                    font-size: ${this.isMobile ? '1.2rem' : '1.5rem'};
                     background: linear-gradient(45deg, #ff0000, #cc0000);
                     color: #ffffff;
                     border: none;
                     border-radius: 20px;
-                    cursor: pointer;
                     font-weight: 700;
                     letter-spacing: 3px;
                     text-transform: uppercase;
                     box-shadow: 0 10px 30px rgba(255, 0, 0, 0.5);
-                    transition: all 0.3s ease;
-                    min-height: ${this.isMobile ? '60px' : '80px'};
-                    width: ${this.isMobile ? '100%' : 'auto'};
-                    max-width: 400px;
                     opacity: 0;
                     transform: scale(0.8);
                     pointer-events: none;
@@ -471,22 +463,15 @@ class FirstImpressionsChallenge {
                 </div>
                 
                 <button id="ready-to-vote-btn" style="
-                    padding: ${this.isMobile ? '20px 40px' : '25px 50px'};
-                    font-family: 'Cinzel', serif;
-                    font-size: ${this.isMobile ? '1.5rem' : '1.8rem'};
                     background: linear-gradient(45deg, ${currentPlayer.color}, ${currentPlayer.color}cc);
                     color: #ffffff;
                     border: none;
                     border-radius: 20px;
-                    cursor: pointer;
                     font-weight: 700;
                     letter-spacing: 3px;
                     text-transform: uppercase;
                     box-shadow: 0 10px 30px ${currentPlayer.color}60;
-                    transition: all 0.3s ease;
-                    min-height: ${this.isMobile ? '70px' : '80px'};
                     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-                    width: ${this.isMobile ? '100%' : 'auto'};
                 ">
                     🎯 READY TO VOTE
                 </button>

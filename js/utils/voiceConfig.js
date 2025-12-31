@@ -66,12 +66,34 @@ class VoiceConfig {
         
         panel.innerHTML = `
             <h2 style="color: #00ffff; margin-bottom: 20px; text-align: center; font-size: 24px;">
-                🎤 Premium Voice Configuration
+                🎤 Realistic AI Voice Settings
             </h2>
             
             <div style="color: #ccc; margin-bottom: 25px; line-height: 1.6;">
-                <p><strong>Upgrade to ultra-realistic AI voices!</strong></p>
-                <p>Configure one or more premium voice services for the most natural, human-like speech experience:</p>
+                <p><strong>New: Ultra-realistic Neural AI voices enabled by default!</strong></p>
+                <p>The game now uses advanced neural synthesis for human-like speech across all devices. You can also configure premium accounts below.</p>
+            </div>
+
+            <!-- Free Neural AI Configuration -->
+            <div class="service-section" style="margin-bottom: 25px; padding: 20px; background: rgba(0, 255, 128, 0.1); border-radius: 10px; border-left: 4px solid #00ff80;">
+                <h3 style="color: #00ff80; margin-bottom: 15px; display: flex; align-items: center;">
+                    ⚡ Free Neural AI (Automatic)
+                    <span style="background: #00ff80; color: #000; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px;">ACTIVE</span>
+                </h3>
+                <p style="color: #ccc; margin-bottom: 15px;">
+                    Modern neural voices provided automatically for a natural experience on all devices.
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; display: block; margin-bottom: 5px;">Select Persona:</label>
+                    <select id="free-neural-voice" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #555; background: #2a2a3e; color: #fff;">
+                        <option value="Amy">Amy (American Female - Professional)</option>
+                        <option value="Emma">Emma (British Female - Crisp)</option>
+                        <option value="Brian">Brian (British Male - Deep)</option>
+                        <option value="Joey">Joey (American Male - Friendly)</option>
+                        <option value="Joanna">Joanna (American Female - Clear)</option>
+                        <option value="Salli">Salli (American Female - Teen)</option>
+                    </select>
+                </div>
             </div>
             
             <!-- ElevenLabs Configuration -->
@@ -257,6 +279,10 @@ class VoiceConfig {
      * Load current configuration into the UI
      */
     loadCurrentConfig() {
+        // Load Free Neural config
+        const freeVoice = localStorage.getItem('free_neural_voice_name') || 'Amy';
+        document.getElementById('free-neural-voice').value = freeVoice;
+
         // Load ElevenLabs config
         const elevenLabsKey = localStorage.getItem('elevenlabs_api_key');
         if (elevenLabsKey) {
@@ -280,6 +306,7 @@ class VoiceConfig {
      * Save the configuration
      */
     saveConfiguration() {
+        const freeVoice = document.getElementById('free-neural-voice').value;
         const elevenLabsKey = document.getElementById('elevenlabs-key').value.trim();
         const elevenLabsVoice = document.getElementById('elevenlabs-voice').value;
         const azureKey = document.getElementById('azure-key').value.trim();
@@ -291,6 +318,10 @@ class VoiceConfig {
         if (window.gameManager && window.gameManager.voiceManager) {
             const vm = window.gameManager.voiceManager;
             
+            // Update free neural voice
+            vm.voiceServices.free_neural.voiceName = freeVoice;
+            localStorage.setItem('free_neural_voice_name', freeVoice);
+
             if (elevenLabsKey) {
                 vm.setElevenLabsKey(elevenLabsKey);
                 vm.voiceServices.elevenlabs.voiceId = elevenLabsVoice;
@@ -433,4 +464,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     console.log('🎤 Voice Config utility initialized. Press Ctrl+Shift+V to configure premium voices.');
-}); 
+});

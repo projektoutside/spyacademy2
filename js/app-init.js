@@ -187,6 +187,9 @@
                 
                 // Set up skip voting checkbox
                 setupSkipVotingCheckbox();
+
+                // Set up voice settings button
+                setupVoiceSettingsButton();
                 
                 resolve();
             } catch (error) {
@@ -329,20 +332,20 @@
         }
         
         var colors = [
-            { color: '#ff0000', name: 'Red' },
-            { color: '#00ff00', name: 'Green' },
-            { color: '#0080ff', name: 'Blue' },
-            { color: '#ffff00', name: 'Yellow' },
-            { color: '#ff8000', name: 'Orange' },
-            { color: '#8000ff', name: 'Purple' },
-            { color: '#ff0080', name: 'Pink' },
-            { color: '#00ff80', name: 'Cyan' }
+            { color: '#ff0000', name: 'Red', emoji: '🔴' },
+            { color: '#00ff00', name: 'Green', emoji: '🟢' },
+            { color: '#0080ff', name: 'Blue', emoji: '🔵' },
+            { color: '#ffff00', name: 'Yellow', emoji: '🟡' },
+            { color: '#ff8000', name: 'Orange', emoji: '🟠' },
+            { color: '#8000ff', name: 'Purple', emoji: '🟣' },
+            { color: '#ff0080', name: 'Pink', emoji: '🌸' },
+            { color: '#00ff80', name: 'Cyan', emoji: '💎' }
         ];
         
         var selectedColors = [];
         var playerNames = [];
         
-        // Build UI
+        // Build UI with Dropdown Selection
         var html = '';
         for (var i = 0; i < playerCount; i++) {
             html += '<div class="player-color-row">';
@@ -350,14 +353,15 @@
             html += '<input type="text" class="player-name-input" data-player="' + i + '" ';
             html += 'placeholder="Enter Player ' + (i + 1) + ' Name" value="Player ' + (i + 1) + '" maxlength="20">';
             html += '</div>';
-            html += '<div class="color-options" data-player="' + i + '">';
+            html += '<div class="color-dropdown-section">';
+            html += '<select class="color-select" data-player="' + i + '">';
+            html += '<option value="" disabled selected>Select Team Color</option>';
             
-            colors.forEach(function(c, idx) {
-                html += '<div class="color-option" data-color="' + c.color + '" data-name="' + c.name + '" ';
-                html += 'data-index="' + idx + '" style="background-color: ' + c.color + ';" title="' + c.name + '"></div>';
+            colors.forEach(function(c) {
+                html += '<option value="' + c.color + '" data-name="' + c.name + '">' + c.emoji + ' ' + c.name.toUpperCase() + '</option>';
             });
             
-            html += '</div></div>';
+            html += '</select></div></div>';
         }
         
         colorGrid.innerHTML = html;
@@ -374,13 +378,13 @@
             });
         });
         
-        // Set up color selection
-        var colorOptions = colorGrid.querySelectorAll('.color-option');
-        colorOptions.forEach(function(option) {
-            var handler = function() {
-                var playerIdx = parseInt(option.closest('.color-options').getAttribute('data-player'));
-                var color = option.getAttribute('data-color');
-                var colorName = option.getAttribute('data-name');
+        // Set up dropdown selection
+        var colorSelects = colorGrid.querySelectorAll('.color-select');
+        colorSelects.forEach(function(select) {
+            select.addEventListener('change', function() {
+                var playerIdx = parseInt(this.getAttribute('data-player'));
+                var color = this.value;
+                var colorName = this.options[this.selectedIndex].getAttribute('data-name');
                 
                 // Check if color already selected by another player
                 var alreadySelected = selectedColors.some(function(sc, idx) {
@@ -391,6 +395,8 @@
                     if (window.soundManager && typeof window.soundManager.playWarning === 'function') {
                         window.soundManager.playWarning();
                     }
+                    this.value = selectedColors[playerIdx] ? selectedColors[playerIdx].color : "";
+                    alert("This color is already claimed by another agent!");
                     return;
                 }
                 
@@ -403,33 +409,48 @@
                 
                 updateColorStates();
                 checkColorSelectionComplete();
-            };
-            
-            option.addEventListener('click', handler);
-            option.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                handler();
             });
         });
         
         function updateColorStates() {
-            colorOptions.forEach(function(opt) {
-                var optColor = opt.getAttribute('data-color');
-                var optPlayerIdx = parseInt(opt.closest('.color-options').getAttribute('data-player'));
+            // Get all currently selected values
+            var currentlySelectedValues = selectedColors
+                .filter(function(sc) { return sc && sc.color; })
+                .map(function(sc) { return sc.color; });
+
+            colorSelects.forEach(function(select) {
+                var playerIdx = parseInt(select.getAttribute('data-player'));
+                var currentValue = select.value;
                 
-                var isSelectedByThisPlayer = selectedColors[optPlayerIdx] && selectedColors[optPlayerIdx].color === optColor;
-                var isSelectedByOther = selectedColors.some(function(sc, idx) {
-                    return idx !== optPlayerIdx && sc && sc.color === optColor;
+                // 1. Manage visibility/availability of options
+                Array.from(select.options).forEach(function(option) {
+                    if (!option.value) return; // Skip placeholder
+                    
+                    var isSelectedByOthers = currentlySelectedValues.includes(option.value) && option.value !== currentValue;
+                    
+                    if (isSelectedByOthers) {
+                        option.disabled = true;
+                        option.style.display = 'none';
+                    } else {
+                        option.disabled = false;
+                        option.style.display = 'block';
+                    }
                 });
-                
-                opt.classList.toggle('selected', isSelectedByThisPlayer);
-                opt.classList.toggle('disabled', isSelectedByOther);
-                
-                // Update name input color
-                var nameInput = colorGrid.querySelector('.player-name-input[data-player="' + optPlayerIdx + '"]');
-                if (nameInput && selectedColors[optPlayerIdx]) {
-                    nameInput.style.backgroundColor = selectedColors[optPlayerIdx].color;
-                    nameInput.style.color = getContrastColor(selectedColors[optPlayerIdx].color);
+
+                // 2. Dynamic styling for the dropdown based on selected color
+                if (selectedColors[playerIdx]) {
+                    var color = selectedColors[playerIdx].color;
+                    select.style.backgroundColor = color;
+                    select.style.color = getContrastColor(color);
+                    select.style.borderColor = color;
+                    
+                    // Also update name input color to match
+                    var nameInput = colorGrid.querySelector('.player-name-input[data-player="' + playerIdx + '"]');
+                    if (nameInput) {
+                        nameInput.style.backgroundColor = color;
+                        nameInput.style.color = getContrastColor(color);
+                        nameInput.style.borderColor = color;
+                    }
                 }
             });
         }
@@ -638,21 +659,95 @@
     }
     
     /**
-     * Setup fullscreen toggle
+     * Setup robust cross-browser fullscreen toggle
      */
     function setupFullscreenToggle() {
         var btn = document.getElementById('fullscreen-toggle');
         if (!btn) return;
-        
-        btn.addEventListener('click', function() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function(err) {
-                    console.warn('Fullscreen failed:', err);
-                });
+
+        // Function to check if currently in fullscreen
+        function isFullscreen() {
+            return !!(document.fullscreenElement || 
+                     document.webkitFullscreenElement || 
+                     document.mozFullScreenElement || 
+                     document.msFullscreenElement);
+        }
+
+        // Update button UI based on state
+        function updateUI() {
+            if (isFullscreen()) {
+                btn.innerHTML = '🗗';
+                btn.title = 'Exit Fullscreen';
+                btn.classList.add('active');
             } else {
-                document.exitFullscreen();
+                btn.innerHTML = '⛶';
+                btn.title = 'Enter Fullscreen';
+                btn.classList.remove('active');
             }
+        }
+
+        // Handle the toggle action
+        function toggleFullscreen() {
+            try {
+                if (window.soundManager) window.soundManager.playClick();
+                
+                if (!isFullscreen()) {
+                    var el = document.documentElement;
+                    var requestMethod = el.requestFullscreen || 
+                                       el.webkitRequestFullscreen || 
+                                       el.webkitRequestFullScreen || 
+                                       el.mozRequestFullScreen || 
+                                       el.msRequestFullscreen;
+
+                    if (requestMethod) {
+                        requestMethod.call(el).catch(function(err) {
+                            console.warn('Fullscreen request rejected:', err);
+                        });
+                    } else if (typeof window.ActiveXObject !== "undefined") { // Old IE
+                        var wscript = new ActiveXObject("WScript.Shell");
+                        if (wscript !== null) wscript.SendKeys("{F11}");
+                    }
+                } else {
+                    var exitMethod = document.exitFullscreen || 
+                                    document.webkitExitFullscreen || 
+                                    document.mozCancelFullScreen || 
+                                    document.msExitFullscreen;
+                    
+                    if (exitMethod) {
+                        exitMethod.call(document).catch(function(err) {
+                            console.warn('Exit fullscreen failed:', err);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Fullscreen toggle error:', error);
+            }
+        }
+
+        // Event Listeners
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleFullscreen();
         });
+
+        btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            toggleFullscreen();
+        }, { passive: false });
+
+        // Listen for fullscreen change events (handles ESC key and system changes)
+        [
+            'fullscreenchange', 
+            'webkitfullscreenchange', 
+            'mozfullscreenchange', 
+            'MSFullscreenChange'
+        ].forEach(function(evt) {
+            document.addEventListener(evt, updateUI);
+        });
+
+        // Initial UI state
+        updateUI();
+        console.log('✅ Robust Fullscreen toggle configured');
     }
     
     /**
@@ -680,6 +775,31 @@
         });
     }
     
+    /**
+     * Setup voice settings button
+     */
+    function setupVoiceSettingsButton() {
+        var voiceBtn = document.getElementById('voice-settings-toggle');
+        if (voiceBtn) {
+            voiceBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.voiceConfig) {
+                    window.voiceConfig.showConfig();
+                    if (window.soundManager) window.soundManager.playClick();
+                }
+            });
+            
+            // Add touch event for mobile
+            voiceBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                this.click();
+            }, { passive: false });
+            
+            console.log('✅ Voice settings button configured');
+        }
+    }
+
     /**
      * Show main menu
      */

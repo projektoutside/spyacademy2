@@ -894,19 +894,26 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 15px;
-    background: rgba(0,255,255,0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(0,255,255,0.2);
-    animation: fadeIn 0.6s ease-out;
-    min-height: 70px;
+    margin-bottom: 12px;
+    padding: 12px 20px;
+    background: rgba(0, 255, 255, 0.03);
+    border-radius: 15px;
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    animation: fadeIn 0.5s ease-out;
+    min-height: 60px;
     box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.player-color-row:hover {
+    background: rgba(0, 255, 255, 0.08);
+    border-color: rgba(0, 255, 255, 0.3);
 }
 
 .player-name-section {
-    flex: 0 0 180px;
-    margin-right: 15px;
+    flex: 1;
+    margin-right: 20px;
+    max-width: 300px;
 }
 
 .player-name-input {
@@ -950,58 +957,47 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
     margin-right: 15px;
 }
 
-.color-options {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+.color-dropdown-section {
+    flex: 0 0 220px;
 }
 
-.color-option {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.3);
+.color-select {
+    width: 100%;
+    padding: 12px 15px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    background: rgba(0, 20, 40, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.color-option::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255,255,255,0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
     transition: all 0.3s ease;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300ffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
+    padding-right: 40px;
 }
 
-.color-option:hover {
-    transform: scale(1.1);
-    border-color: #ffffff;
-    box-shadow: 0 0 15px rgba(255,255,255,0.5);
+.color-select:focus {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
 }
 
-.color-option.selected {
-    border-color: #00ffff;
-    box-shadow: 0 0 25px rgba(0,255,255,0.8);
+.color-select option {
+    background: #1a1a2e;
+    color: #fff;
+    font-weight: 600;
+    padding: 10px;
 }
 
-.color-option.selected::after {
-    width: 16px;
-    height: 16px;
-}
-
-.color-option.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    filter: grayscale(100%);
+/* Specific styling for the placeholder option */
+.color-select option[disabled] {
+    color: rgba(255, 255, 255, 0.4);
 }
 
 /* Enhanced mobile touch feedback */
@@ -2112,40 +2108,38 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
     }
 }
 
-/* Skip Button for Testing */
-.skip-toggle {
+/* Voice Settings Button */
+.voice-settings-toggle {
     position: fixed;
     top: 20px;
     right: 80px; /* Position to the left of volume button */
     width: 50px;
     height: 50px;
-    background: linear-gradient(45deg, #ff6b35, #f7931e);
+    background: linear-gradient(135deg, #00ff80, #00cc66);
     color: #fff;
-    border: 2px solid rgba(255, 107, 53, 0.5);
+    border: 2px solid rgba(0, 255, 128, 0.4);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 1.5rem;
-    font-weight: bold;
     z-index: 9998;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 255, 128, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     touch-action: manipulation;
 }
 
-.skip-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
-    border-color: rgba(255, 107, 53, 0.8);
-    background: linear-gradient(45deg, #ff8c5a, #ffab3e);
+.voice-settings-toggle:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 25px rgba(0, 255, 128, 0.4);
+    border-color: rgba(0, 255, 128, 0.8);
 }
 
-.skip-toggle:active {
-    transform: scale(0.95);
+.voice-settings-toggle:active {
+    transform: scale(0.9);
 }
 
 /* Fullscreen Toggle Button */
@@ -2379,7 +2373,7 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
 
 /* Mobile adjustments for volume controls */
 @media (max-width: 768px) {
-    .skip-toggle {
+    .voice-settings-toggle {
         top: 15px;
         right: 70px; /* Adjust for mobile spacing */
         width: 45px;
@@ -3914,7 +3908,7 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
         padding-right: env(safe-area-inset-right);
     }
     
-    .volume-toggle, .skip-toggle, .fullscreen-toggle {
+    .volume-toggle, .voice-settings-toggle, .fullscreen-toggle {
         top: max(15px, env(safe-area-inset-top));
     }
     
@@ -3977,4 +3971,185 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
     }
+}
+
+/* ========================================= */
+/* GLOBAL STATIONARY ACTION BUTTONS          */
+/* Anchored at bottom center for all devices */
+/* ========================================= */
+#confirm-colors,
+#skip-instructions-btn,
+#ready-btn,
+#continue-btn,
+#finish-btn,
+#skip-intro-btn,
+#start-challenge-btn,
+#start-turn-btn,
+#confirm-selections-btn,
+#confirm-choice-btn,
+#cont-ana-btn,
+#continue-vote-btn,
+#gameover-play-again-same,
+#gameover-start-new,
+#play-again-same-players,
+#start-new-game,
+#begin-impressions-btn,
+#ready-to-vote-btn {
+    position: fixed !important;
+    bottom: clamp(20px, 6vh, 50px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 20000 !important;
+    margin: 0 !important;
+    width: auto !important;
+    min-width: min(280px, 85vw) !important;
+    max-width: 90vw !important;
+    white-space: nowrap !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 255, 255, 0.4) !important;
+    padding: clamp(15px, 2vh, 25px) clamp(30px, 4vw, 50px) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+/* Special Case: Double buttons (Game Over / Victory Screens) */
+/* We stack them or position them side-by-side if there's room */
+#gameover-start-new, 
+#start-new-game {
+    bottom: clamp(90px, 14vh, 130px) !important; /* Higher up to make room for play again button */
+}
+
+/* Ensure content has enough bottom padding to not be obscured by stationary buttons */
+.selection-container, 
+.challenge-container, 
+.scene, 
+.challenge-overlay > div,
+.victory-overlay {
+    padding-bottom: 120px !important;
+}
+
+/* Touch feedback for stationary buttons */
+#confirm-colors,
+#skip-instructions-btn,
+#ready-btn,
+#continue-btn,
+#finish-btn,
+#skip-intro-btn,
+#start-challenge-btn,
+#start-turn-btn,
+#confirm-selections-btn,
+#confirm-choice-btn,
+#cont-ana-btn,
+#continue-vote-btn,
+#begin-impressions-btn,
+#ready-to-vote-btn {
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    border-radius: 50px !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    cursor: pointer !important;
+}
+
+/* Individual Button Theming */
+
+/* Orange Theme - Skip Instructions */
+#skip-instructions-btn {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 107, 53, 0.4) !important;
+}
+
+#skip-instructions-btn:hover {
+    box-shadow: 0 0 40px rgba(255, 107, 53, 0.6) !important;
+    transform: translateX(-50%) translateY(-3px) scale(1.02) !important;
+}
+
+#skip-intro-btn:active,
+#skip-instructions-btn:active {
+    transform: scale(0.95) !important;
+}
+
+/* Blue/Cyan Tactical Theme - Confirmations */
+#confirm-selections-btn, 
+#confirm-choice-btn,
+#confirm-colors {
+    background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%) !important;
+    color: #000000 !important;
+    border-color: rgba(0, 255, 255, 0.5) !important;
+}
+
+#confirm-selections-btn:hover,
+#confirm-choice-btn:hover,
+#confirm-colors:hover {
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.6) !important;
+    transform: translateX(-50%) translateY(-3px) scale(1.02) !important;
+}
+
+/* Green "GO" Theme - Start Turn / Begin Challenge */
+#start-turn-btn,
+#start-challenge-btn,
+#ready-btn,
+#ready-to-vote-btn,
+#begin-impressions-btn,
+#skip-intro-btn {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%) !important;
+    color: #000000 !important;
+    border-color: rgba(0, 255, 136, 0.5) !important;
+}
+
+#start-turn-btn:hover,
+#start-challenge-btn:hover,
+#ready-btn:hover,
+#ready-to-vote-btn:hover,
+#begin-impressions-btn:hover,
+#skip-intro-btn:hover {
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.6) !important;
+    transform: translateX(-50%) translateY(-3px) scale(1.02) !important;
+}
+
+/* Purple/Magenta Theme - Secrets/Special */
+#continue-btn,
+#finish-btn,
+#cont-ana-btn,
+#continue-vote-btn {
+    background: linear-gradient(135deg, #ff00ff 0%, #8000ff 100%) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 0, 255, 0.4) !important;
+}
+
+#continue-btn:hover,
+#finish-btn:hover,
+#cont-ana-btn:hover,
+#continue-vote-btn:hover {
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.6) !important;
+    transform: translateX(-50%) translateY(-3px) scale(1.02) !important;
+}
+
+/* Disabled State Styling */
+button:disabled {
+    filter: grayscale(1) opacity(0.5) !important;
+    cursor: not-allowed !important;
+    transform: translateX(-50%) !important;
+}
+
+#confirm-colors:active,
+#skip-instructions-btn:active,
+#ready-btn:active,
+#continue-btn:active,
+#finish-btn:active,
+#skip-intro-btn:active,
+#start-challenge-btn:active,
+#start-turn-btn:active,
+#confirm-selections-btn:active,
+#confirm-choice-btn:active,
+#cont-ana-btn:active,
+#continue-vote-btn:active,
+#begin-impressions-btn:active,
+#ready-to-vote-btn:active {
+    transform: translateX(-50%) scale(0.95) !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4) !important;
 }
