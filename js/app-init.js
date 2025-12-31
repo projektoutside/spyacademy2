@@ -188,12 +188,83 @@
                 // Set up skip voting checkbox
                 setupSkipVotingCheckbox();
                 
+                // Set up AI voice API key controls
+                setupVoiceSettings();
+                
                 resolve();
             } catch (error) {
                 console.error('❌ UI setup failed:', error);
                 resolve(); // Continue anyway
             }
         });
+    }
+    
+    /**
+     * Setup voice settings for API key management
+     */
+    function setupVoiceSettings() {
+        var saveBtn = document.getElementById('save-api-key');
+        var clearBtn = document.getElementById('clear-api-key');
+        var keyInput = document.getElementById('elevenlabs-api-key');
+        var statusDiv = document.getElementById('voice-status');
+        
+        if (!saveBtn || !clearBtn || !keyInput || !statusDiv) {
+            console.log('⚠️ Voice settings UI elements not found');
+            return;
+        }
+        
+        // Load saved API key
+        var savedKey = localStorage.getItem('elevenlabs_api_key');
+        if (savedKey) {
+            keyInput.value = savedKey;
+            updateVoiceStatus('API key loaded - ElevenLabs ready!', 'success');
+        }
+        
+        // Save API key
+        saveBtn.addEventListener('click', function() {
+            var key = keyInput.value.trim();
+            
+            if (!key) {
+                updateVoiceStatus('Please enter a valid API key', 'error');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('elevenlabs_api_key', key);
+            
+            // Update voice manager if available
+            if (window.audioManager && window.audioManager.setElevenLabsKey) {
+                window.audioManager.setElevenLabsKey(key);
+            }
+            
+            updateVoiceStatus('API key saved! Voice will use ElevenLabs (Adam voice)', 'success');
+            console.log('✅ ElevenLabs API key saved');
+        });
+        
+        // Clear API key
+        clearBtn.addEventListener('click', function() {
+            localStorage.removeItem('elevenlabs_api_key');
+            keyInput.value = '';
+            
+            // Update voice manager if available
+            if (window.audioManager && window.audioManager.setElevenLabsKey) {
+                window.audioManager.setElevenLabsKey(null);
+            }
+            
+            updateVoiceStatus('API key cleared - will use browser default voice', 'info');
+            console.log('🗑️ ElevenLabs API key cleared');
+        });
+        
+        function updateVoiceStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'voice-status ' + type;
+            
+            // Auto-clear status after 5 seconds
+            setTimeout(function() {
+                statusDiv.textContent = '';
+                statusDiv.className = 'voice-status';
+            }, 5000);
+        }
     }
     
     /**

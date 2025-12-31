@@ -2377,6 +2377,195 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
     box-shadow: 0 4px 12px rgba(255, 51, 51, 0.2);
 }
 
+/* Voice Settings Section */
+.voice-settings-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.voice-settings-section h4 {
+    font-family: 'Cinzel', 'Arial', serif;
+    color: #00ffff;
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.voice-info {
+    font-size: 0.8rem;
+    color: #999999;
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.api-key-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.api-key-input-group label {
+    font-size: 0.85rem;
+    color: #cccccc;
+    font-weight: 600;
+}
+
+.api-key-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    background: rgba(0, 20, 40, 0.8);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.api-key-input:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.api-key-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+}
+
+.save-api-key-btn {
+    padding: 10px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #00ffff, #0099cc);
+    color: #000000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.save-api-key-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+    background: linear-gradient(45deg, #33ffff, #00bbff);
+}
+
+.api-key-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.get-api-link {
+    font-size: 0.8rem;
+    color: #00ffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.get-api-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.clear-api-key-btn {
+    padding: 8px 15px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 51, 51, 0.1);
+    border: 1px solid rgba(255, 51, 51, 0.3);
+    border-radius: 6px;
+    color: #ff3333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-api-key-btn:hover {
+    background: rgba(255, 51, 51, 0.2);
+    border-color: #ff3333;
+}
+
+.voice-status {
+    font-size: 0.8rem;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.voice-status.success {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    color: #00ff00;
+}
+
+.voice-status.error {
+    background: rgba(255, 51, 51, 0.1);
+    border: 1px solid rgba(255, 51, 51, 0.3);
+    color: #ff3333;
+}
+
+.voice-status.info {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: #00ffff;
+}
+
+/* Mobile adjustments for voice settings */
+@media (max-width: 768px) {
+    .voice-settings-section {
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .voice-settings-section h4 {
+        font-size: 1rem;
+    }
+    
+    .voice-info {
+        font-size: 0.75rem;
+    }
+    
+    .api-key-input {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+    
+    .save-api-key-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .api-key-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .get-api-link {
+        order: 2;
+    }
+    
+    .clear-api-key-btn {
+        order: 1;
+        width: 100%;
+    }
+}
+
 /* Mobile adjustments for volume controls */
 @media (max-width: 768px) {
     .skip-toggle {

@@ -9,13 +9,14 @@ class VoiceManager {
         // Voice service configuration
         this.voiceServices = {
             elevenlabs: {
-                enabled: false,
+                enabled: true, // Enable by default for consistent voice across devices
                 apiKey: null,
                 voiceId: 'pNInz6obpgDQGcFmaJgB', // Adam - Professional male
                 model: 'eleven_multilingual_v2',
-                stability: 0.5,
-                similarityBoost: 0.8,
-                style: 0.3
+                stability: 0.35, // Lower = more expressive, higher = more consistent
+                similarityBoost: 0.9, // Maximum voice similarity
+                style: 0.2, // Subtle style for natural sound
+                useOptimizedStreaming: true
             },
             azure: {
                 enabled: false,
