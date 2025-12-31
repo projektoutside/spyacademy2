@@ -142,24 +142,62 @@
             if (audioUnlocked) return;
             
             console.log('🎵 First user interaction detected:', e.type);
+            audioUnlocked = true;
+            window.LightChallengeApp.audioContextStarted = true;
             
+            // Resume AudioContext if sound manager exists
             if (window.soundManager && typeof window.soundManager.resumeAudioContext === 'function') {
                 window.soundManager.resumeAudioContext()
                     .then(function() {
-                        audioUnlocked = true;
-                        window.LightChallengeApp.audioContextStarted = true;
                         console.log('✅ Audio context ready');
                     })
                     .catch(function(err) {
                         console.warn('⚠️ Audio context failed:', err);
                     });
             }
+            
+            // Unlock voice synthesis for iOS devices
+            if (window.audioManager && typeof window.audioManager.unlockAudio === 'function') {
+                window.audioManager.unlockAudio()
+                    .then(function() {
+                        console.log('✅ Voice audio unlocked for iOS');
+                    })
+                    .catch(function(err) {
+                        console.warn('⚠️ Voice unlock failed:', err);
+                    });
+            }
+            
+            // Also try global voiceManager
+            if (window.gameManager && window.gameManager.voiceManager) {
+                var vm = window.gameManager.voiceManager;
+                if (typeof vm.unlockAudio === 'function') {
+                    vm.unlockAudio().catch(function(err) {
+                        console.warn('⚠️ VoiceManager unlock failed:', err);
+                    });
+                }
+            }
         }
         
-        // Listen for first interaction
-        document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
-        document.addEventListener('keydown', unlockAudio, { once: true });
+        // Listen for first interaction - use capture to catch all events
+        document.addEventListener('click', unlockAudio, { once: true, capture: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true, capture: true, passive: true });
+        document.addEventListener('touchend', unlockAudio, { once: true, capture: true, passive: true });
+        document.addEventListener('keydown', unlockAudio, { once: true, capture: true });
+        
+        // Also unlock on any button click
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                if (window.audioManager && typeof window.audioManager.unlockAudio === 'function') {
+                    window.audioManager.unlockAudio();
+                }
+                if (window.gameManager && window.gameManager.voiceManager) {
+                    var vm = window.gameManager.voiceManager;
+                    if (typeof vm.unlockAudio === 'function') {
+                        vm.unlockAudio();
+                    }
+                }
+            }
+        }, { capture: true });
     }
     
     /**
