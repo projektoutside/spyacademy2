@@ -1294,6 +1294,11 @@ class RockPaperScissorsChallenge {
         const aiHand = document.getElementById('ai-hand');
         const rpsTextEl = document.getElementById('rps-text');
         const resultTextEl = document.getElementById('battle-result-text');
+
+        // Play Rock Paper Scissors Shoot chant sound
+        if (this.soundManager && typeof this.soundManager.playRPSChant === 'function') {
+            this.soundManager.playRPSChant();
+        }
         
         // During counting phase, show fist (rock) for both player and AI
         // Only reveal actual choice on "SHOOT!"
@@ -1907,14 +1912,49 @@ class RockPaperScissorsChallenge {
     createOverlay() {
         const overlay = document.createElement('div');
         overlay.className = 'challenge-overlay';
-        overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-family: 'Cinzel', serif; flex-direction: column;`;
+        overlay.style.cssText = `
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            height: calc(var(--vh, 1vh) * 100); 
+            background: rgba(0, 0, 0, 0.95); 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            z-index: 10000; 
+            color: white; 
+            font-family: 'Cinzel', serif; 
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px);
+            box-sizing: border-box;
+        `;
         return overlay;
     }
     
     createPlayerDecisionOverlay() {
         const overlay = document.createElement('div');
         overlay.className = 'player-decision-overlay';
-        overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #000; display: flex; justify-content: center; align-items: center; z-index: 10001;`;
+        overlay.style.cssText = `
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            height: calc(var(--vh, 1vh) * 100); 
+            background: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            z-index: 10001;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: env(safe-area-inset-top, 20px) 10px env(safe-area-inset-bottom, 20px);
+            box-sizing: border-box;
+        `;
         return overlay;
     }
     

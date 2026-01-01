@@ -72,29 +72,36 @@ class FirstImpressionsChallenge {
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.98), rgba(40, 0, 0, 0.98));
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             z-index: 10000;
             animation: fadeIn 0.8s ease-out;
-            padding: 20px;
+            padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px);
             box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         `;
         
         const content = document.createElement('div');
         content.style.cssText = `
-            background: linear-gradient(135deg, rgba(80, 0, 0, 0.9), rgba(120, 20, 20, 0.9));
-            border: 3px solid rgba(255, 0, 0, 0.6);
-            border-radius: 25px;
-            padding: ${this.isMobile ? '30px' : '50px'};
-            max-width: ${this.isMobile ? '90vw' : '800px'};
-            width: 100%;
+            background: linear-gradient(135deg, ${currentPlayer.color}20, ${currentPlayer.color}40);
+            border: 4px solid ${currentPlayer.color};
+            border-radius: 30px;
+            padding: ${this.isMobile ? '20px' : '60px'};
             text-align: center;
-            box-shadow: 0 0 80px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 80px ${currentPlayer.color}80;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            max-width: ${this.isMobile ? '95vw' : '600px'};
+            width: 95%;
+            animation: fadeIn 0.5s ease-out;
+            margin: 0 auto;
+            margin-top: 0 !important;
+            flex-shrink: 0;
         `;
         
         content.innerHTML = `
@@ -203,11 +210,13 @@ class FirstImpressionsChallenge {
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 0, 20, 0.95));
             z-index: 9999;
             display: flex;
             animation: fadeIn 0.5s ease-out;
+            overflow: hidden;
         `;
         
         // Detect if this is an iPad (larger mobile device)
@@ -220,14 +229,19 @@ class FirstImpressionsChallenge {
         leftPanel.id = 'live-results-panel';
         leftPanel.style.cssText = `
             width: ${this.isMobile ? (isIPad ? '40%' : '100%') : '35%'};
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(40, 40, 80, 0.9), rgba(60, 60, 100, 0.9));
             border-right: 3px solid rgba(255, 255, 255, 0.3);
             padding: ${isIPad ? '15px' : '20px'};
+            padding-top: env(safe-area-inset-top, 20px);
+            padding-bottom: env(safe-area-inset-bottom, 20px);
             box-sizing: border-box;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
+            z-index: 10002;
             ${this.isMobile && !isIPad ? 'position: absolute; top: 0; left: -100%; transition: left 0.3s ease;' : ''}
         `;
         
@@ -286,13 +300,18 @@ class FirstImpressionsChallenge {
         rightPanel.id = 'individual-voting-panel';
         rightPanel.style.cssText = `
             width: ${this.isMobile ? (isIPad ? '60%' : '100%') : '65%'};
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 40, 0.8));
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: env(safe-area-inset-top, 20px) 10px env(safe-area-inset-bottom, 20px);
+            box-sizing: border-box;
         `;
         
         votingDisplay.appendChild(leftPanel);
@@ -423,14 +442,17 @@ class FirstImpressionsChallenge {
                 background: linear-gradient(135deg, ${currentPlayer.color}20, ${currentPlayer.color}40);
                 border: 4px solid ${currentPlayer.color};
                 border-radius: 30px;
-                padding: ${this.isMobile ? '40px' : '60px'};
+                padding: ${this.isMobile ? '20px' : '60px'};
                 text-align: center;
                 box-shadow: 0 0 80px ${currentPlayer.color}80;
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
-                max-width: ${this.isMobile ? '90vw' : '600px'};
-                width: 90%;
+                max-width: ${this.isMobile ? '95vw' : '600px'};
+                width: 95%;
                 animation: fadeIn 0.5s ease-out;
+                margin: 0 auto;
+                margin-top: 0 !important;
+                flex-shrink: 0;
             ">
                 <h1 style="
                     font-family: 'Cinzel', serif;
@@ -462,17 +484,7 @@ class FirstImpressionsChallenge {
                     </p>
                 </div>
                 
-                <button id="ready-to-vote-btn" style="
-                    background: linear-gradient(45deg, ${currentPlayer.color}, ${currentPlayer.color}cc);
-                    color: #ffffff;
-                    border: none;
-                    border-radius: 20px;
-                    font-weight: 700;
-                    letter-spacing: 3px;
-                    text-transform: uppercase;
-                    box-shadow: 0 10px 30px ${currentPlayer.color}60;
-                    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-                ">
+                <button id="ready-to-vote-btn">
                     🎯 READY TO VOTE
                 </button>
             </div>
@@ -551,16 +563,18 @@ class FirstImpressionsChallenge {
                 background: linear-gradient(135deg, rgba(60, 60, 100, 0.9), rgba(40, 40, 80, 0.9));
                 border: 3px solid #ffffff;
                 border-radius: 25px;
-                padding: ${this.isMobile ? '30px' : '50px'};
+                padding: ${this.isMobile ? '20px' : '50px'};
                 text-align: center;
                 box-shadow: 0 0 100px rgba(255, 255, 255, 0.3);
                 backdrop-filter: blur(25px);
                 -webkit-backdrop-filter: blur(25px);
-                max-width: ${this.isMobile ? '90vw' : '700px'};
+                max-width: ${this.isMobile ? '95vw' : '700px'};
                 width: 100%;
                 max-height: 90vh;
                 overflow-y: auto;
                 animation: fadeIn 0.8s ease-out;
+                margin: 0 auto;
+                flex-shrink: 0;
             ">
                 <div style="margin-bottom: 30px;">
                     <h2 style="font-family: 'Cinzel', serif; font-size: ${this.isMobile ? '2rem' : '2.5rem'}; color: #ffffff; margin-bottom: 15px;">
@@ -628,7 +642,7 @@ class FirstImpressionsChallenge {
                 background: linear-gradient(135deg, rgba(0, 100, 0, 0.9), rgba(0, 150, 0, 0.9));
                 border: 3px solid #00ff00;
                 border-radius: 25px;
-                padding: ${this.isMobile ? '40px' : '60px'};
+                padding: ${this.isMobile ? '20px' : '60px'};
                 text-align: center;
                 box-shadow: 0 0 80px rgba(0, 255, 0, 0.5);
                 backdrop-filter: blur(20px);
@@ -636,6 +650,9 @@ class FirstImpressionsChallenge {
                 max-width: ${this.isMobile ? '90vw' : '500px'};
                 width: 90%;
                 animation: fadeIn 0.5s ease-out;
+                margin: 0 auto;
+                margin-top: 0 !important;
+                flex-shrink: 0;
             ">
                 <h2 style="font-family: 'Cinzel', serif; font-size: ${this.isMobile ? '2rem' : '2.5rem'}; color: #ffffff; margin-bottom: 20px;">
                     ✅ Vote Recorded

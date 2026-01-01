@@ -34,8 +34,113 @@ class RoleManager {
         // Create player objects with roles
         this.generatePlayerRoles(playersData);
         
+        // Start with Game Introduction before role assignment
+        await this.showGameIntroduction();
+        
         // Start the assignment process
         await this.showInitialInstructions();
+    }
+
+    async showGameIntroduction() {
+        return new Promise(async (resolve) => {
+            // Create overlay for game introduction
+            const overlay = document.createElement('div');
+            overlay.id = 'game-introduction-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                height: calc(var(--vh, 1vh) * 100);
+                background: linear-gradient(135deg, rgba(0, 5, 20, 0.98), rgba(0, 20, 40, 0.98));
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                z-index: 11000;
+                animation: fadeIn 1s ease-out;
+                padding: calc(env(safe-area-inset-top, 0px) + 40px) 20px 120px;
+                box-sizing: border-box;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            `;
+
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: linear-gradient(135deg, rgba(0, 40, 80, 0.8), rgba(0, 80, 120, 0.8));
+                border: 3px solid #00ffff;
+                border-radius: 30px;
+                padding: 40px 30px;
+                max-width: 800px;
+                width: 100%;
+                text-align: center;
+                box-shadow: 0 0 80px rgba(0, 255, 255, 0.3);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                margin: 0 auto;
+                flex-shrink: 0;
+            `;
+
+            content.innerHTML = `
+                <div style="margin-bottom: 40px;">
+                    <h1 style="font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 8vw, 4rem); color: #00ffff; margin-bottom: 20px; text-shadow: 0 0 30px rgba(0, 255, 255, 0.8); letter-spacing: 5px;">
+                        WELCOME AGENTS
+                    </h1>
+                    <div style="width: 100px; height: 4px; background: #00ffff; margin: 0 auto 30px; box-shadow: 0 0 20px #00ffff;"></div>
+                    <div style="font-size: clamp(1.2rem, 4vw, 1.6rem); color: #ffffff; line-height: 1.8; text-align: left; padding: 0 10px;">
+                        <p style="margin: 20px 0; color: #00ffff; font-weight: bold; text-align: center;">MISSION BRIEFING IN PROGRESS...</p>
+                        <p style="margin: 15px 0; opacity: 0.9;">Welcome to the <strong>Spy Academy</strong>. You have been selected from thousands of recruits for your unique analytical skills and mental fortitude.</p>
+                        <p style="margin: 15px 0; opacity: 0.9;">But be warned: our intelligence suggests that <strong>double agents</strong> have compromised our ranks. Their goal is to sabotage our mission from within.</p>
+                        <p style="margin: 15px 0; opacity: 0.9;">Your objective is to complete the challenges ahead while identifying the saboteurs among you. Failure is not an option.</p>
+                        <p style="margin: 25px 0; color: #ffaa00; font-weight: bold; text-align: center; font-family: 'Cinzel', serif; letter-spacing: 2px;">TRUST NO ONE. COMPLETE THE MISSION.</p>
+                    </div>
+                </div>
+            `;
+
+            const startBtn = document.createElement('button');
+            startBtn.id = 'begin-impressions-btn'; // Reusing or new ID
+            startBtn.innerHTML = '🛡️ BEGIN MISSION';
+            startBtn.className = 'confirm-btn'; // Use consistent class
+            startBtn.style.cssText = `
+                position: fixed !important;
+                bottom: 40px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                z-index: 22000 !important;
+                background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%) !important;
+                color: #000 !important;
+                font-family: 'Orbitron', sans-serif !important;
+                font-weight: 800 !important;
+                padding: 20px 50px !important;
+                border-radius: 50px !important;
+                border: 2px solid rgba(255,255,255,0.4) !important;
+                cursor: pointer !important;
+                letter-spacing: 2px !important;
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.5) !important;
+            `;
+
+            const cleanup = () => {
+                if (this.voiceManager) this.voiceManager.stop();
+                if (this.soundManager) this.soundManager.playClick();
+                overlay.remove();
+                startBtn.remove();
+                resolve();
+            };
+
+            startBtn.onclick = cleanup;
+
+            overlay.appendChild(content);
+            document.body.appendChild(overlay);
+            document.body.appendChild(startBtn);
+
+            // AI introduction script
+            const introScript = "Welcome to the Spy Academy. You have been selected from thousands of recruits for your unique analytical skills and mental fortitude. But be warned: our intelligence suggests that double agents have compromised our ranks. Their goal is to sabotage our mission from within. Your objective is to complete the challenges ahead while identifying the saboteurs among you. Trust no one. Complete the mission. Failure is not an option. Good luck, agents.";
+
+            if (this.voiceManager) {
+                await this.voiceManager.speak(introScript);
+            }
+        });
     }
     
     generatePlayerRoles(playersData) {
@@ -150,13 +255,19 @@ class RoleManager {
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(50, 0, 100, 0.95));
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             z-index: 9999;
             animation: fadeIn 0.6s ease-out;
+            padding: calc(env(safe-area-inset-top, 0px) + 30px) 15px 120px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         `;
         
         const content = document.createElement('div');
@@ -164,13 +275,16 @@ class RoleManager {
             background: linear-gradient(135deg, rgba(40, 0, 80, 0.9), rgba(80, 0, 120, 0.9));
             border: 3px solid rgba(255, 0, 255, 0.6);
             border-radius: 25px;
-            padding: 40px;
+            padding: 20px;
             max-width: 800px;
             width: 100%;
             text-align: center;
             box-shadow: 0 0 60px rgba(255, 0, 255, 0.4);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
+            margin: 0 auto;
+            margin-top: 0 !important;
+            flex-shrink: 0;
         `;
         
         content.innerHTML = `
@@ -195,21 +309,15 @@ class RoleManager {
                     <p>🤐 <strong>Keep your identity Hidden!</strong></p>
                 </div>
             </div>
-            
-            <div style="margin-top: 40px;">
-                <button id="skip-instructions-btn" style="
-                    background: linear-gradient(45deg, #666666, #444444);
-                    color: #ffffff;
-                    border: none;
-                    border-radius: 10px;
-                    opacity: 0.7;
-                " title="Skip voice instructions and proceed directly">
-                    ⏭️ Skip Instructions
-                </button>
-            </div>
         `;
         
+        const skipBtn = document.createElement('button');
+        skipBtn.id = 'skip-instructions-btn';
+        skipBtn.innerHTML = '⏭️ Skip Instructions';
+        skipBtn.title = 'Skip voice instructions and proceed directly';
+        
         overlay.appendChild(content);
+        overlay.appendChild(skipBtn);
         document.body.appendChild(overlay);
 
         // Auto-progress after voice instructions OR allow skip
@@ -223,7 +331,6 @@ class RoleManager {
         let userSkipped = false;
 
         // Bind skip button first (before voice starts)
-        const skipBtn = document.getElementById('skip-instructions-btn');
         if (skipBtn) {
             skipBtn.addEventListener('click', async () => {
                 if (this.soundManager) this.soundManager.playClick();
@@ -293,13 +400,19 @@ class RoleManager {
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(40, 40, 80, 0.95));
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             z-index: 10000;
             animation: fadeIn 0.5s ease-out;
+            padding: calc(env(safe-area-inset-top, 0px) + 30px) 15px 120px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         `;
         
         const content = document.createElement('div');
@@ -307,13 +420,16 @@ class RoleManager {
             background: linear-gradient(135deg, ${currentPlayer.color}20, ${currentPlayer.color}40);
             border: 4px solid ${currentPlayer.color};
             border-radius: 30px;
-            padding: 60px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 0 80px ${currentPlayer.color}80;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             max-width: 600px;
-            width: 90%;
+            width: 100%;
+            margin: 0 auto;
+            margin-top: 0 !important;
+            flex-shrink: 0;
         `;
         
         content.innerHTML = `
@@ -324,23 +440,14 @@ class RoleManager {
             <p style="font-size: 2rem; color: #ffffff; margin-bottom: 40px; text-shadow: 0 0 20px rgba(255,255,255,0.5);">
                 Please approach the screen
             </p>
-            
-            <button id="ready-btn" style="
-                background: linear-gradient(45deg, ${currentPlayer.color}, ${currentPlayer.color}cc);
-                color: #ffffff;
-                border: none;
-                border-radius: 20px;
-                font-weight: 700;
-                letter-spacing: 3px;
-                text-transform: uppercase;
-                box-shadow: 0 10px 30px ${currentPlayer.color}60;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            ">
-                🎯 READY
-            </button>
         `;
         
+        const readyBtn = document.createElement('button');
+        readyBtn.id = 'ready-btn';
+        readyBtn.innerHTML = '🎯 READY';
+        
         callScreen.appendChild(content);
+        callScreen.appendChild(readyBtn);
         document.body.appendChild(callScreen);
 
         // Speak the player's name for subsequent players (not the first one who was already called)
@@ -352,7 +459,6 @@ class RoleManager {
         }
         
         // Bind ready button
-        const readyBtn = document.getElementById('ready-btn');
         readyBtn.addEventListener('click', async () => {
             callScreen.remove();
             await this.showPlayerSecret(currentPlayer);
@@ -368,13 +474,19 @@ class RoleManager {
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.98), rgba(20, 0, 40, 0.98));
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             z-index: 10001;
             animation: fadeIn 0.8s ease-out;
+            padding: calc(env(safe-area-inset-top, 0px) + 30px) 15px 120px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         `;
         
         const content = document.createElement('div');
@@ -382,13 +494,16 @@ class RoleManager {
             background: linear-gradient(135deg, rgba(60, 60, 100, 0.9), rgba(40, 40, 80, 0.9));
             border: 3px solid #ffffff;
             border-radius: 25px;
-            padding: 60px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 0 100px rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             max-width: 700px;
-            width: 90%;
+            width: 100%;
+            margin: 0 auto;
+            margin-top: 0 !important;
+            flex-shrink: 0;
         `;
         
         const roleColor = player.role === 'Bad' ? '#ff0000' : '#00ff00';
@@ -458,31 +573,20 @@ class RoleManager {
             </div>
             
             ${partnerInfo}
-            
-            <div style="margin-top: 50px;">
-                <button id="continue-btn" style="
-                    background: linear-gradient(45deg, #4444ff, #2222cc);
-                    color: #ffffff;
-                    border: none;
-                    border-radius: 15px;
-                    font-weight: 600;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                    box-shadow: 0 8px 25px rgba(68, 68, 255, 0.4);
-                ">
-                    🔄 Continue
-                </button>
-            </div>
         `;
         
+        const continueBtn = document.createElement('button');
+        continueBtn.id = 'continue-btn';
+        continueBtn.innerHTML = '🔄 Continue';
+        
         secretScreen.appendChild(content);
+        secretScreen.appendChild(continueBtn);
         document.body.appendChild(secretScreen);
         
         // Mark player as received
         player.hasReceived = true;
         
         // Bind continue button
-        const continueBtn = document.getElementById('continue-btn');
         continueBtn.addEventListener('click', async () => {
             secretScreen.remove();
             await this.showNextPlayerPrompt();
@@ -519,13 +623,19 @@ class RoleManager {
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(40, 40, 80, 0.95));
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             z-index: 10000;
             animation: fadeIn 0.5s ease-out;
+            padding: calc(env(safe-area-inset-top, 0px) + 30px) 15px 120px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         `;
         
         const content = document.createElement('div');
@@ -533,13 +643,16 @@ class RoleManager {
             background: linear-gradient(135deg, rgba(80, 80, 120, 0.9), rgba(60, 60, 100, 0.9));
             border: 3px solid #888888;
             border-radius: 25px;
-            padding: 50px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 0 60px rgba(136, 136, 136, 0.4);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             max-width: 600px;
-            width: 90%;
+            width: 100%;
+            margin: 0 auto;
+            margin-top: 0 !important;
+            flex-shrink: 0;
         `;
         
         content.innerHTML = `
@@ -551,26 +664,17 @@ class RoleManager {
                 Call over the next player.<br/>
                 Once they are ready, press 'Finish' to continue.
             </p>
-            
-            <button id="finish-btn" style="
-                background: linear-gradient(45deg, #888888, #666666);
-                color: #ffffff;
-                border: none;
-                border-radius: 15px;
-                font-weight: 600;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                box-shadow: 0 8px 25px rgba(136, 136, 136, 0.4);
-            ">
-                ✅ Finish
-            </button>
         `;
         
+        const finishBtn = document.createElement('button');
+        finishBtn.id = 'finish-btn';
+        finishBtn.innerHTML = '✅ Finish';
+        
         promptScreen.appendChild(content);
+        promptScreen.appendChild(finishBtn);
         document.body.appendChild(promptScreen);
         
         // Bind finish button
-        const finishBtn = document.getElementById('finish-btn');
         finishBtn.addEventListener('click', async () => {
             promptScreen.remove();
             await this.callNextPlayer();

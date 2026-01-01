@@ -3996,21 +3996,25 @@ button, .clickable, .player-btn, .color-option, .submit-btn, .clear-btn {
 #begin-impressions-btn,
 #ready-to-vote-btn {
     position: fixed !important;
-    bottom: clamp(20px, 6vh, 50px) !important;
+    bottom: 30px !important;
+    bottom: clamp(20px, 5vh, 50px) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 20000 !important;
+    z-index: 21000 !important;
     margin: 0 !important;
     width: auto !important;
-    min-width: min(280px, 85vw) !important;
-    max-width: 90vw !important;
+    min-width: min(300px, 90vw) !important;
+    max-width: 95vw !important;
     white-space: nowrap !important;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 255, 255, 0.4) !important;
-    padding: clamp(15px, 2vh, 25px) clamp(30px, 4vw, 50px) !important;
-    display: inline-flex !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 255, 0.4) !important;
+    padding: 18px 40px !important;
+    padding: clamp(15px, 2.5vh, 25px) clamp(30px, 5vw, 60px) !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
+    top: auto !important; /* Force reset top if inherited */
+    flex-shrink: 0 !important;
 }
 
 /* Special Case: Double buttons (Game Over / Victory Screens) */

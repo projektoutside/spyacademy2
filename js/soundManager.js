@@ -809,6 +809,14 @@ class SoundManager {
     }
 
     /**
+     * Play Rock Paper Scissors Shoot chant sound
+     */
+    playRPSChant() {
+        this.playAudioFileWithPerfectTiming('sounds/rockpapersscissorsshoot.mp3');
+        this.logger?.audioDebug('Playing Rock Paper Scissors Shoot chant');
+    }
+
+    /**
      * Play countdown beep sound for epic battle timer
      */
     playCountdownBeep(number) {
@@ -1302,4 +1310,4 @@ class SoundManager {
 }
 
 // Make SoundManager available globally
-window.SoundManager = SoundManager; 
+window.SoundManager = SoundManager;
